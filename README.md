@@ -7,3 +7,4 @@ This repository contains the project to develop the orbit determination and the 
 * Gabriele Boccacci, 1844287
 * Giulia Nejat, 1738188
 * Tommaso Pantalani, 1806049
+* Fabio Argentesi, 1754893
