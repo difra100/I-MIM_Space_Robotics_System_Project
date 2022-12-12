@@ -26,9 +26,9 @@ plot(time_steps,points(:,2))
 
 figure
 show(robot,qs(1,:)');
-view(2)
-ax = gca;
-ax.Projection = 'orthographic';
+%view(2)
+%ax = gca;
+%ax.Projection = 'orthographic';
 hold on
 plot(points(:,1),points(:,2),'k')
 
