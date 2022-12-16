@@ -1,19 +1,19 @@
 Parametri orbitali
 
 h = 343.21
-Giustificazione:
+Giustificazione: Circi (EarthMoonandPlanets)
 
 i = 92.77
-Giustificazione:
+Giustificazione: Circi (EarthMoonandPlanets)
 
 e = 0.073
-Giustificazione:
+Giustificazione: Paper (effetto g marte su orbite)
 
 OMEGA = 270
-Giustificazione:
+Giustificazione: Da calcolare
 
 omega = 270
-Giustificazione:
+Giustificazione: Paper (quasi circular forzen orbit)
 
 
 Si considera fino a J4
