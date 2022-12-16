@@ -1,5 +1,5 @@
 # I-MIM-Space Robotics System Project
-This repository contains the project to develop the orbit determination and the space manipulator design for the I-MIM mission, that will be launched in 2026. This work is part of the Space Robotics System exam, held by professor Antonio Genova in La Sapienza università di Roma.
+This repository contains the project to develop the orbit determination and the space manipulator design for the I-MIM mission, that will be launched in 2026. This work is part of the Space Robotics System exam, held by professor Antonio Genova in Sapienza università di Roma.
 
 ### Project members
 * Andrea Giuseppe Di Francesco, 1836928
