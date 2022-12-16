@@ -1,18 +1,18 @@
 Parametri orbitali
 
-h = 343.21
+a = 3732.71 km
 Giustificazione: Circi (EarthMoonandPlanets)
 
-i = 92.77
+i = 92.77 deg
 Giustificazione: Circi (EarthMoonandPlanets)
 
 e = 0.073
 Giustificazione: Paper (effetto g marte su orbite)
 
-OMEGA = 270
+OMEGA = 270 deg
 Giustificazione: Da calcolare
 
-omega = 270
+omega = 270 deg
 Giustificazione: Paper (quasi circular forzen orbit)
 
 
