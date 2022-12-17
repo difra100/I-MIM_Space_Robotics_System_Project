@@ -6,12 +6,15 @@ init;
 
 % DH table [alpha_i d_i a_i theta_i] (original method)
 
-DHTABLE = [pi/2  l1  0 q1 ;
-           -pi/2  l2  0 q2];
+DHTABLE = DH_generator([pi/2,-pi/2],l,q);
+q_i =[0;0]
+DHparam = DH_generator([pi/2,-pi/2],l,q_i);
+robot = create_robot(DHparam,q_i);
 
 %% KINEMATICS
 [T_EE,R_EE,p_EE] = forward_kinematics(DHTABLE);
-%disp(T_EE)
+
+
 disp('---------------------- Forward kinematics ---------------------')
 disp(p_EE)
 
@@ -47,7 +50,7 @@ temp2 = [0, M(1,2);M(2,1),0];        % M - M_ii
 %tau_m = (I_m + M_ii*)
 
 %% TRAJECTORIES
-target = [pi/6 pi/3 pi];;   % target orientation of the EE
+target = [pi/12 pi/3 pi];   % target orientation of the EE
 q_i = [0;0];     
 T = 30;
 [phi, theta, psi] = get_target_orientation(q,R_EE,target)
@@ -57,21 +60,11 @@ disp('------------------------ Trajectory ---------------------------')
 
 [traj_q_1,traj_dq_1,traj_ddq_1] = quintic_poly_traj(q_i(1), q_f(1),0,0,0,0,t,T);
 [traj_q_2,traj_dq_2,traj_ddq_2] = quintic_poly_traj(q_i(2), q_f(2)',0,0,0,0,t,T);
-traj_q = [traj_q_1;traj_q_2]
+traj_q = [traj_q_1;traj_q_2];
 
-DHparam = [pi/2  l1  0 q_i(1) ;
-    -pi/2 l2  0 q_i(2)];
-plot_robot_traj(DHparam,traj_q,q,p_EE,t,T)
 
-% [traj_q, traj_dq, traj_ddq] = optimal_traj(q,q_i,theta_low_bounds',theta_high_bounds',target,t,T);
-% disp(vpa(traj_q,2));
-% disp(vpa(traj_dq,2))
-% disp(vpa(traj_ddq,2))
-% 
-% DHparam = [0  l1  0 q_i(1) ;
-%            0  l2  0 q_i(2)];
-% 
-% plot_robot_traj(DHparam,traj_q,q,p_EE,t,T)
+plot_robot_traj(robot,traj_q,q,p_EE,t,T);
+
 
 
 

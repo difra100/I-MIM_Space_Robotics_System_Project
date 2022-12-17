@@ -1,13 +1,13 @@
-function plot_robot_traj(DHparam,traj,q,f,t,T)
+function plot_robot_traj(robot,traj,q,f,t,T)
 
 q1 = q(1);
 q2 = q(2);
+% 
+% [DH_T1,A1] = DHMatrix( DHparam(1,:));
+% [DH_T2,A2] = DHMatrix( DHparam(2,:));
 
-DH_T1 = DHMatrix( DHparam(1,:));
-DH_T2 = DHMatrix( DHparam(2,:));
 
-
-robot = create_robot(DH_T1,DH_T2);
+%robot = create_robot(DH_T1,DH_T2);
 
 
 time_steps = (0:0.2:T)'; % Time
@@ -22,15 +22,14 @@ for i = 1:count
     points(i,:) = vpa(subs(subs(f,q1,qs(i,1)),q2,qs(i,2)),2);
 end
 
-plot(time_steps,points(:,2))
-
 figure
 show(robot,qs(1,:)');
+axis([-1,1,-1,1,-1,1]*30)
 %view(2)
 %ax = gca;
 %ax.Projection = 'orthographic';
 hold on
-plot(points(:,1),points(:,2),'k')
+plot3(points(:,1),points(:,2),points(:,3),'k')
 
 framesPerSecond = 30;
 r = rateControl(framesPerSecond);
