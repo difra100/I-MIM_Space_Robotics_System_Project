@@ -1,4 +1,4 @@
-function [T_0N, R_0N, p] = forward_kinematics(DHTABLE)
+function [T_0N, R_0N, p] = forward_kinematics(DHTABLE,T_i_b)
 % INPUTS:
 % - DH table = [alpha_i a_i d_i theta_i]           
 
@@ -32,7 +32,7 @@ for i=1:N
     T = simplify(T);
 end
 
-T_0N = T;    % final Transformation matrix (roto-translation)
-R_0N = T(1:3,1:3);   % finalt Rotation matrix
-p = T(1:3,4);       % final cartesian Position
+T_0N = T_i_b*T;    % final Transformation matrix (roto-translation)
+R_0N = T_0N(1:3,1:3);   % finalt Rotation matrix
+p = T_0N(1:3,4);       % final cartesian Position
 

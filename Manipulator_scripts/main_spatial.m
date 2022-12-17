@@ -6,42 +6,42 @@ init;
 
 % DH table [alpha_i d_i a_i theta_i] (original method)
 
-DHTABLE = DH_generator([pi/2,-pi/2],l,q);
-q_i =[0;0]
-DHparam = DH_generator([pi/2,-pi/2],l,q_i);
-robot = create_robot(DHparam,q_i);
+[DHTABLE,T_i_b]= DH_generator(l,q);
+q_i =[0;0];
+
+robot = create_robot(l,q_i);
 
 %% KINEMATICS
-[T_EE,R_EE,p_EE] = forward_kinematics(DHTABLE);
+[T_EE,R_EE,p_EE] = forward_kinematics(DHTABLE,T_i_b);
 
 
-disp('---------------------- Forward kinematics ---------------------')
-disp(p_EE)
+% disp('---------------------- Forward kinematics ---------------------')
+% disp(p_EE)
 
 % Jacobian (given p_EE forward kinematics)
 J=jacobian(p_EE, q');
-disp('----------------------- Jacobian matrix -----------------------')
-disp(J)
+% disp('----------------------- Jacobian matrix -----------------------')
+% disp(J)
 
 
 %% DYNAMICS
 
 [M, V, B, C] = dynamic_model(q, dq, ddq, m, l, d, I1,I2);
-disp('------------------------ Inertia matrix ------------------------')
-disp(vpa(M,3))
-disp('-----------------Coriolis/centrifucgal terms -------------------')
-disp(vpa(V,3))
-disp('---------------- Splitting V in B and C ------------------------')
-disp(vpa(B,3))
-disp(vpa(C,3))
+% disp('------------------------ Inertia matrix ------------------------')
+% disp(vpa(M,3))
+% disp('-----------------Coriolis/centrifucgal terms -------------------')
+% disp(vpa(V,3))
+% disp('---------------- Splitting V in B and C ------------------------')
+% disp(vpa(B,3))
+% disp(vpa(C,3))
 
 % Accounting for friction
 tau_f = c_f*sign(dq) + v_f*dq;
 
 % Motor torques after reduction (links side)
 tau = M*ddq + V + tau_f;
-disp('------------------------ Final dynamic model -------------------')
-disp(vpa(tau,3))
+% disp('------------------------ Final dynamic model -------------------')
+% disp(vpa(tau,3))
 % Motor torques before reduction (motor side)
 temp1 = [M(1,1)/ni_1^2 , 0; 0, M(2,2)/ni_2^2]; % diag(M(ii)/ni_i^2)
 temp2 = [0, M(1,2);M(2,1),0];        % M - M_ii
@@ -50,11 +50,11 @@ temp2 = [0, M(1,2);M(2,1),0];        % M - M_ii
 %tau_m = (I_m + M_ii*)
 
 %% TRAJECTORIES
-target = [pi/12 pi/3 pi];   % target orientation of the EE
+target = [-pi/3 -2*pi/3 2*pi/3];   % target orientation of the EE
 q_i = [0;0];     
 T = 30;
-[phi, theta, psi] = get_target_orientation(q,R_EE,target)
-q_f = [theta; psi]
+[phi, theta, psi] = get_target_orientation(q,R_EE,target);
+q_f = [theta; psi];
 
 disp('------------------------ Trajectory ---------------------------')
 
@@ -62,8 +62,8 @@ disp('------------------------ Trajectory ---------------------------')
 [traj_q_2,traj_dq_2,traj_ddq_2] = quintic_poly_traj(q_i(2), q_f(2)',0,0,0,0,t,T);
 traj_q = [traj_q_1;traj_q_2];
 
-
-plot_robot_traj(robot,traj_q,q,p_EE,t,T);
+target_p = subs(p_EE,q,q_f);
+plot_robot_traj(robot,traj_q,target_p,q,p_EE,t,T);
 
 
 
