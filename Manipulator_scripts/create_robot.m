@@ -45,7 +45,7 @@ setFixedTransform(jointEE, trvec2tform([0,0,0]));
 body.Joint = jointEE;
 addBody(robot, tool, 'link2');
 
-showdetails(robot)
+% showdetails(robot)
 
 end
 

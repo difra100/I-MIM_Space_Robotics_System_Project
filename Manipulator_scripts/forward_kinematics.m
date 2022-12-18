@@ -13,16 +13,17 @@ TDH = [ cos(theta_i) -sin(theta_i)*cos(alpha_i)  sin(theta_i)*sin(alpha_i) a_i*c
 %% Build transformation matrices for each link
 [N,~] = size(DHTABLE);
 A = cell(1,N);
+T = eye(4);
 
-% For every row in 'DHTABLE', substitute the right value from the general
-% DH matrix
 for i = 1:N
-    alpha_i = DHTABLE(i,1);
-    a_i = DHTABLE(i,2);
-    d_i = DHTABLE(i,3);
-    theta_i = DHTABLE(i,4);
-    A_i = subs(TDH);
-    A{i} = A_i;
+    line = DHTABLE(i, :);
+    R = [cos(line(4)) -cos(line(1))*sin(line(4)) sin(line(1))*sin(line(4)) line(2)*cos(line(4));
+         sin(line(4)) cos(line(1))*cos(line(4)) -sin(line(1))*cos(line(4)) line(2)*sin(line(4));
+         0 sin(line(1)) cos(line(1)) line(3);     
+         0 0 0 1;];
+    A{i} = R;
+    T = T * R;  
+    
 end
 
 %% Forward kinematics

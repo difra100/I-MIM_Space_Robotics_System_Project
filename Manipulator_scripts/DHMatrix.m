@@ -1,4 +1,4 @@
-function [T, A] = DHMatrix(arrays)
+function [T] = DHMatrix(arrays)
 % T = DHMatrix(arrays) takes as inputs:
 %   -arrays: a n-vector of vectors composed like this: [alpha a d theta]
 % and outputs:
@@ -23,7 +23,7 @@ function [T, A] = DHMatrix(arrays)
         T = T * R;   
     end
 
-    if isa(T, 'sym')
-        T = simplify(T);
-    end
+%     if isa(T, 'sym')
+%         T = simplify(T);
+%     end
 end
