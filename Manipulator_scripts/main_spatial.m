@@ -51,10 +51,10 @@ temp2 = [0, M(1,2);M(2,1),0];        % M - M_ii
 %tau_m = (I_m + M_ii*)
 
 %% TRAJECTORIES
-target_pos = [10,30,20];
+target_pos = [10,20,20];
 q_i = [0;0];     
 T = 10;
-q_f = get_target_conf(q,q_i,p_EE,p_tip,target_pos);
+q_f = get_target_conf(q,p_EE,p_tip,target_pos,theta_bounds);
 
 
 [traj_q_1,traj_dq_1,traj_ddq_1] = quintic_poly_traj(q_i(1), q_f(1),0,0,0,0,t,T);

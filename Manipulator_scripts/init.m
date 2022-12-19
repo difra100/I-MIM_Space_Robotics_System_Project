@@ -48,9 +48,8 @@ theta1_min = -135 * pi/180;
 theta2_min = -138 * pi/180;
 theta1_max = 150 * pi/180;
 theta2_max= 80 * pi/180;
-
-theta_high_bounds = [theta1_max,theta2_max];
-theta_low_bounds = [theta1_min,theta2_min];
+theta_bounds.high = [theta1_max,theta2_max];
+theta_bounds.low = [theta1_min,theta2_min];
 
 
 %% ACTUATORS parameters
