@@ -1,0 +1,17 @@
+function [DHtable,T_o_b] = DH_generator(l,q)
+
+DHtable = [-pi/2 7 0  q(1) ;
+           0  5  0 q(2)];
+
+% T_i_b = transformation from the INERTIA frame to the BASE of the manipulator
+dx=2;
+T_i_b= DHMatrix([pi/2,dx,dx,pi/2]);   
+% = [[eye(3),[dx;dx;0]];0,0,0,1]
+
+% T_o_i = transformation from the LVLH frame to the INERTIA frame
+R_o_i = rpy_rotation('xyz',[-pi/2,-pi/2,-pi/2])
+T_o_i = [R_o_i,[0;0;0]
+         0 0 0 1];
+
+T_o_b = T_o_i*T_i_b;
+end

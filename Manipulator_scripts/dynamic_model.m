@@ -55,6 +55,7 @@ M(1,1)=diff(T,dq(1),2);
 M(2,2)=diff(T,dq(2),2);
 
 TempB1=diff(T,dq(1));
+
 M(1,2)=diff(TempB1,dq(2));
 M(2,1)=M(1,2);
 

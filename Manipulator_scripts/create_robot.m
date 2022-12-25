@@ -4,7 +4,7 @@ function robot = create_robot(l,q_i)
 robot = rigidBodyTree('DataFormat','col'); %The 'base' is actually the inertia frame
 
 
-[DHparam,T_i_b] = DH_generator(l,q_i);
+[DHparam,T_o_b] = DH_generator(l,q_i);
 col1 = DHparam(:,1);
 col2 = DHparam(:,2);
 col3 = DHparam(:,3);
@@ -12,11 +12,11 @@ col4 = DHparam(:,4);
 DHparam = [col2 col1 col3 col4];
 % This is becaue rigid body uses a different order in the 
 % definition of the DH table
+% Definition of the base RF
 
-% Definition of the base RF 
 body0 = rigidBody('base_fixed');
 transf = rigidBodyJoint('transf', 'fixed');
-setFixedTransform(transf, T_i_b);
+setFixedTransform(transf, T_o_b);
 body0.Joint = transf;
 addBody(robot, body0, 'base');
 
@@ -41,7 +41,7 @@ addBody(robot, body2, 'link1');
 % Defining the EE
 tool = rigidBody('tool');
 jointEE = rigidBodyJoint('fix1','fixed');
-setFixedTransform(jointEE, trvec2tform([0,0,0]));
+setFixedTransform(jointEE, trvec2tform([1,0,0]));
 body.Joint = jointEE;
 addBody(robot, tool, 'link2');
 
