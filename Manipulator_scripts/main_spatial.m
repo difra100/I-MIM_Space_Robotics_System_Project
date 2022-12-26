@@ -69,7 +69,8 @@ temp2 = [0, M(1,2);M(2,1),0];        % M - M_ii
 %% TRAJECTORIES
 target_pos = [10,30,10];
 q_i = [0;0];     
-T = 10;
+T = 10;     % TO eliminate when doing bang-cost-bang once in dynamics
+
 q_f = get_target_conf(q,p_EE,p_tip,target_pos,theta_bounds);
 
 
