@@ -30,7 +30,7 @@ m1 = 2*radius*pi*l1*thickness*density;
 m2 = 2*radius*pi*l2*thickness*density;
 m = [m1,m2];
 
-% Inertias  (TO CHECK)
+% Inertias  (OK Inerzie - Tommaso)
 I1xx = (m1*(radius^2 + inner_radius^2))/2;
 I1yy = (m1*(3*(radius^2 + inner_radius^2)+l1^2))/12;
 I1zz = I1yy;
