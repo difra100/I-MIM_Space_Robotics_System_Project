@@ -21,9 +21,14 @@ p_tip = T_tip(1:3,4);
 % disp(p_EE)
 
 % Jacobian (given p_EE forward kinematics)
-J=jacobian(p_EE, q');
 disp('----------------------- Jacobian matrix -----------------------')
-disp(J)
+J_a = analitic_jacobian(p_EE,q');
+disp('Analitic Jacobian:')
+disp(vpa(J_a,2))
+[J_L,J_A] = geometric_jacobian(DHTABLE,q',['r','r']);
+J_g = [J_L;J_A] ;
+disp('Geometric Jacobian:')
+disp(J_g)
 
 
 %% IMPORTANT TRANSFORMATIONS
