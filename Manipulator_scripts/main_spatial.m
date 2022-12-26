@@ -17,8 +17,8 @@ robot = create_robot(l,q_i);
 T_tip = T_EE*trvec2tform([1,0,0]);
 p_tip = T_tip(1:3,4);
 
-% disp('---------------------- Forward kinematics ---------------------')
-% disp(p_EE)
+disp('---------------------- Forward kinematics ---------------------')
+disp(p_EE)
 
 % Jacobian (given p_EE forward kinematics)
 disp('----------------------- Jacobian matrix -----------------------')
@@ -67,11 +67,11 @@ temp2 = [0, M(1,2);M(2,1),0];        % M - M_ii
 %tau_m = (I_m + M_ii*)
 
 %% TRAJECTORIES
-target_pos = [10,30,10];
+target_pos = [10,0,10];
 q_i = [0;0];     
 T = 10;     % TO eliminate when doing bang-cost-bang once in dynamics
 
-q_f = get_target_conf(q,p_EE,p_tip,target_pos,theta_bounds);
+[q_f]  = get_target_conf(q,p_EE,p_tip,target_pos,theta_bounds);
 
 
 [traj_q_1,traj_dq_1,traj_ddq_1] = quintic_poly_traj(q_i(1), q_f(1),0,0,0,0,t,T);

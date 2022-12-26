@@ -30,40 +30,38 @@ q_f = [q1_f;q2_f];
 
 
 
-% Solution as optimizaion problem (NOT WORK)
+% Solution as optimization problem (NOT WORK)
 % q_i = [0;0];
 % q1 = optimvar('q1','LowerBound',q_bounds.low(1),'UpperBound',q_bounds.high(1));
 % q2 = optimvar('q2','LowerBound',q_bounds.low(2),'UpperBound',q_bounds.high(2));
 % q = [q1,q2];
+% 
 % [DHTABLE,T_i_b]= DH_generator([7,5],q);
+% 
 % T = DHMatrix(DHTABLE);            % base -> EE
 % T_EE = T*T_i_b;                   % inertia -> EE
 % p_EE = T_EE(1:3,4);             % forwrd kinematics
 % 
-% 
 % T_tip = T_EE*trvec2tform([1,0,0]);     % inertia -> tip
-% p_tip = T_tip(1:3,4);              % forwrd kinematics tip
+% p_tip = T_tip(1:3,4);              % forward kinematics tip
 % 
-% v_1 = [];
-% v_2 = [];
-% for i=1:3
-%     v_1 = [v_1;p_tip(i)-p_EE(i)];
-%     v_2 = [v_2;target(i)-p_EE(i)];
-% end
-% 
+% v_1 = target' - p_EE;       % direction from EE to target
+% v_2 = p_tip - p_EE;         % direction of the antenna
 % 
 % % Initial Guesses
 % q0.q1 = 0;
 % q0.q2 = 0;
 % 
-% prob = optimproblem();
-% prob.Objective = q1^2+q2^2;
+% % the objective is to make v_1 and v_2 parallel ==> cross() = [0,0,0]
+% obj = norm(cross(v_1,v_2));
+% prob = optimproblem('Objective',obj);
 % 
-% % The solution we want is: distance EE->trarget > Tip->target
-% % prob.Constraints.cons = n_1-n_2 <= 0;           
+% % The solution we want is the one such that:
+% %   distance EE->trarget > Tip->target
 % 
-% prob.Constraints.cons1 = dot(v_1,v_2)/(norm(v_1)*norm(v_2)) == 1;
-% prob.Constraints.cons2 = cross(v_1,v_2) ==0;
+% prob.Constraints.constraint = dot(v_1,v_2)/(norm(v_1)*norm(v_2)) == 1;
+% 
+% show(prob)
 % 
 % q_f = solve(prob,q0);
 % 
