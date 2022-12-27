@@ -37,7 +37,7 @@ disp(J_g)
 % T_i_b : INERTIA frame -> BASE frame
 % T_o_i:  LVLH frame -> INERTIA frame
 
-R_o_i = [0 0 1;0 1 0;-1 0 0];
+R_o_i = [0 0 1;0 -1 0;1 0 0];
 T_o_i = [[R_o_i,[0;0;0]];0 0 0 1]; % LVLH frame -> INERTIA frame
 
 
@@ -67,26 +67,40 @@ temp2 = [0, M(1,2);M(2,1),0];        % M - M_ii
 %tau_m = (I_m + M_ii*)
 
 %% TRAJECTORIES
-target_pos = [10,0,10];
-q_i = [0;0];     
-T = 10;     % TO eliminate when doing bang-cost-bang once in dynamics
-
-[q_f]  = get_target_conf(q,p_EE,p_tip,target_pos,theta_bounds);
+target_poss = get_targets(orbit_ts, 'earth');
 
 
-[traj_q_1,traj_dq_1,traj_ddq_1] = quintic_poly_traj(q_i(1), q_f(1),0,0,0,0,t,T);
-[traj_q_2,traj_dq_2,traj_ddq_2] = quintic_poly_traj(q_i(2), q_f(2)',0,0,0,0,t,T);
-traj_q = [traj_q_1;traj_q_2];
-disp('------------------------ Trajectory ---------------------------')
-disp(vpa(traj_q,2));
+q_i = [pi;0];     
+T = 2;     % TO eliminate when doing bang-cost-bang once in dynamics
+
+% To cumulate points
+qss = [];
+pointss = [];
+
+% Get full trajectory
+for i = 1:size(target_poss,2)
+    [q_f] = get_target_conf(q,p_EE,p_tip,cell2mat(target_poss(i)),theta_bounds, q_i)
+
+    
+    [traj_q_1,traj_dq_1,traj_ddq_1] = quintic_poly_traj(q_i(1), q_f(1),0,0,0,0,t,T);
+    [traj_q_2,traj_dq_2,traj_ddq_2] = quintic_poly_traj(q_i(2), q_f(2)',0,0,0,0,t,T);
+    
+    disp('------------------------ Trajectory ---------------------------')
+%     disp(vpa(traj_q,2));
+    traj = [traj_q_1, traj_q_2];
+    [qs, points] = get_trajectory_points(traj, t, T, q, p_EE);
+    % PLOTS
+    
+    q_i = q_f;
+
+    qss = [qss;qs];
+    pointss = [pointss; points];
+
+end
 
 
-%% PLOTS
-plot_robot_traj(robot,traj_q,target_pos,q,p_EE,p_tip,t,T);
 
-
-
-
+plot_robot_traj(robot, qss, pointss, cell2mat(target_poss(size(target_poss,2))),q,p_EE,p_tip)
 
 
 

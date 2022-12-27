@@ -1,4 +1,4 @@
-function plot_robot_traj(robot,traj,target_pos,q,f,f_tip,t,T)
+function plot_robot_traj(robot, qs, points,target_pos,q,f,f_tip)
 
 
 q1 = q(1);
@@ -11,17 +11,8 @@ target_pos = target_pos;
 %robot = create_robot(DH_T1,DH_T2);
 
 
-time_steps = (0:0.2:T)'; % Time
-count = length(time_steps); % discrete time intervals
 
- % preallocate memory
-qs = zeros(count, 2); 
-points = zeros(count, 3);
 
-for i = 1:count
-    qs(i,:) = subs(traj,t,time_steps(i));
-    points(i,:) = vpa(subs(subs(f,q1,qs(i,1)),q2,qs(i,2)),2);
-end
 
 figure
 show(robot,qs(1,:)');
@@ -65,7 +56,7 @@ scatter3(target_pos(1),target_pos(2),target_pos(3),100,'g','filled');
 %-------> Trajectory
 framesPerSecond = 30;
 r = rateControl(framesPerSecond);
-for i = 1:count
+for i = 1:size(qs,1)
     show(robot,qs(i,:)','PreservePlot',false);
     drawnow
     EE_pos = subs(f,q,qs(i,:)');

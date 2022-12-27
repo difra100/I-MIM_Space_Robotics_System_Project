@@ -87,6 +87,9 @@ c_f = 3;     %Coulomb
 %I1 = eye(3);
 %I2 = eye(3);
 
+%% PLOT PARAMETERS
+
+orbit_ts = 5;
 
 
 
