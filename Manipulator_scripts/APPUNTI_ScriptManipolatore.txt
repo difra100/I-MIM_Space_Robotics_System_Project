@@ -1,0 +1,64 @@
+APPUNTI (Script del Manipolatore)
+=====================================================================================================================================================
+COSE DA RIVEDERE NEL CODICE
+---------------------------
+
+- Il jacobiano nella sezione %% kinematics.
+
+- Rivedere la funzione "get_target_conf" in quanto questa si cerca il vettore di puntamento, verso il quale puntare l'ent effector sulla base di un
+  vettore di coordinate cartesiane assegnato; in reatà il vettore di puntamento è gia assegnato in quanto la direzione della Terra rispetto allo s/c
+  può essere calcolata a priori. Altra cosa da risolvere in questa funzione è il fatto che si utilizza il risolutore "vpasolve" il quale non accetta 
+  constraints e quindi certe volte i due vettori si allineano ma con versi opposti.
+
+
+
+=====================================================================================================================================================
+CONSIGLI PER L'UTILIZZO
+-----------------------
+
+1) Quando bisogna definire una variabile, inserirla nella funzione "init"
+
+
+=====================================================================================================================================================
+LISTA FUNZIONI
+--------------
+
+1) "init" : Funzione nella quale vengono definite/inizializzate tutte le variabili
+
+2) "DH_generator" : Genera la tabella di Denavit Hattemberg (nella convenzione classica, non quella modificata) e la matrice di trasformazione dal
+                    riferimento inerziale dello spacecraft alla base del manipolatore. Gli imput di questa funzione sono "l" e "q".
+
+3) "create_robot" : Genera il robot. Questa funzione utilizza delle funzioni di Matlab per generare corpi rigidi che costituiranno i link del robot 
+                    durante i plot. Gli input di questa fnzione sono "l" e "q_i".
+
+4) "forward_kinematics" : Questa funzione calcola la matrice di trasformazione dalla base (0) al giunto N-esimo; la matrice di rotazione ad esso 
+                          associata e la posizione finale del riferimento N-esimo in coordinate cartesiane. Gli input di questa funzione sono la
+                          tabella di DH e la matrice di trasformazione dal riferimento inerziale dello spacecraft.
+
+5) "dynamic_model" : Questa funzione contiene il modello dinamico di Eulero-Lagrange. Per ciascun link si calcola l'energia cinetica di rotazione, 
+                     di traslazione e quella totale (la somma delle precedenti). Si calcola dunque a matrce di massa M; quella di Coriolis V e la si
+                     sdoppia nelle matrici B e C. L'output di questa funzione sono dunque le matrici M, V, B, C necesssarie per la dinamica. Gli input
+                     necessari sono: q (vettore di stato), dq (vettore di stato derivato), ddq (vettore di stato doppio derivato), m, l, d, I1, I2.
+
+6) "get_target_conf" : assegnati il vettore di stato, la posizione dell'end effector in coord cartesiane, il vettore posizione del tip in coordinarte
+                       cartesiane, il target da raggiungere in coordinate cartesiane e i limiti sugli angoli possibili dei giunti; si determina il 
+                       vettore di stato finale che garantisca l'end effector puntato verso il target. Sulla base del target questa funzione determina 
+                       un vettore di puntamento [il quale dovrà essere verso la terra oppure off nadir di 15 gradi => DA MODIFICARWE] e a tale vettore
+                       si cerca di allineare il vettore che va dall'end-effector al tip
+
+7) "quintic_poly_traj" : usa un polinomio di quinta generazione per garantire continuità nelle posizioni, velocità ed accelerazioni nella generazione 
+                         della traiettoria
+
+8) "plot_robot_traj" : plot delcorpo centrale e dei due link che si muovono per giungere a puntamento.
+
+
+===================================================================================================================================================
+ALTRE SPIEGAZIONI UTILI
+-----------------------
+
+1) Le due righe di codice per la definizione di T_tip e p_tip nella sezione %% kinematics e che seguono il richiamo della funzione "forward_kinematics",
+   servono per tenere conto del fatto che oltre l'end effector ci sta anche il tool, cioè l'antenna.
+
+2) Nella sezione %% important transformation viene ceata la rotazione e la rasformazione per passare dal riferimento LVLH a quello inerziale
+
+3) Nella sezione %% Dynamics si utilizza il metodo di Eulero-Lagrange (nella appendice delle slides del prof. Genova) e non quello 
