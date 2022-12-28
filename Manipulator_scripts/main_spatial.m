@@ -52,26 +52,22 @@ disp('---------------- Splitting V in B and C ------------------------')
 disp(vpa(B,3))
 disp(vpa(C,3))
 
-% Accounting for friction
-tau_f = c_f*sign(dq) + v_f*dq;
+% % Accounting for friction
+% tau_f = c_f*sign(dq) + v_f*dq;
 
 % Motor torques after reduction (links side)
-tau = M*ddq + V + tau_f;
+tau = M*ddq + V;%+ tau_f;
 disp('------------------------ Final dynamic model -------------------')
 disp(vpa(tau,3))
-% Motor torques before reduction (motor side)
-temp1 = [M(1,1)/ni_1^2 , 0; 0, M(2,2)/ni_2^2]; % diag(M(ii)/ni_i^2)
-temp2 = [0, M(1,2);M(2,1),0];        % M - M_ii
-%ni_diag = [1/n_1,0;0,1/n_2];          
-%ni_2 = [1/n_1^2,1/n_2^2];
-%tau_m = (I_m + M_ii*)
+
 
 %% TRAJECTORIES
+syms T real
+syms s real % --> s = t/T in [0,1] (timing law)
+
 target_poss = get_targets(orbit_ts, 'earth');
 
-
 q_i = [pi;0];     
-T = 2;     % TO eliminate when doing bang-cost-bang once in dynamics
 
 % To cumulate points
 qss = [];
@@ -79,15 +75,33 @@ pointss = [];
 
 % Get full trajectory
 for i = 1:size(target_poss,2)
-    [q_f] = get_target_conf(q,p_EE,p_tip,cell2mat(target_poss(i)),theta_bounds, q_i)
+    T = 1;     % TO tune when doing bang-cost-bang once in dynamics
 
+    [q_f] = get_target_conf(q,p_EE,p_tip,cell2mat(target_poss(i)),theta_bounds, q_i);
+
+%     [traj_q_1,traj_dq_1,traj_ddq_1] = quintic_poly_traj(q_i(1), q_f(1),0,0,0,0,t,T);
+%     [traj_q_2,traj_dq_2,traj_ddq_2] = quintic_poly_traj(q_i(2), q_f(2)',0,0,0,0,t,T)
+%      
+%     traj = [traj_q_1, traj_q_2];
+%     disp(vpa(traj_q,2));
     
-    [traj_q_1,traj_dq_1,traj_ddq_1] = quintic_poly_traj(q_i(1), q_f(1),0,0,0,0,t,T);
-    [traj_q_2,traj_dq_2,traj_ddq_2] = quintic_poly_traj(q_i(2), q_f(2)',0,0,0,0,t,T);
+    % Path planning
+    [path_q_1, path_dq_1,path_ddq_1] = path_planning(q_i(1), q_f(1), 0, 0, 0, 0,s);
+    [path_q_2, path_dq_2,path_ddq_2] = path_planning(q_i(2), q_f(2), 0, 0, 0, 0,s);
+    path = [path_q_1,path_q_2];
+    % Timing law computation: 
+    % Tune the T in oder to have the torque boundaries respected and then:
+    %               t = s*T ....    traj = sub(path,s,t/T)
+    tau_m = torque_motor([path_dq_1,path_dq_2],[path_ddq_1,path_ddq_2],ni,I_m,M,B_m);
+    
+    T = timing_law(q,s,t,path,tau_m,tau_max)
+   
+    s_t = t/T;
     
     disp('------------------------ Trajectory ---------------------------')
-%     disp(vpa(traj_q,2));
-    traj = [traj_q_1, traj_q_2];
+    traj = subs(path,s,s_t);
+    disp(vpa(traj,2));
+   
     [qs, points] = get_trajectory_points(traj, t, T, q, p_EE);
     % PLOTS
     

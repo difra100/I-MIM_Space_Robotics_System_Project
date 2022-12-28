@@ -7,9 +7,6 @@ function q_f = get_target_conf(q,f,f_tip,target,q_bounds, init_guess)
 % Looking for matricial form:
 
 
-
-
-
 v_1 = target' - f;       % direction from EE to target
 v_2 = target' - f_tip;         % direction of the antenna
 

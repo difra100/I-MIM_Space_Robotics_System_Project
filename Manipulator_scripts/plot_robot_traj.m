@@ -1,6 +1,5 @@
 function plot_robot_traj(robot, qs, points,target_pos,q,f,f_tip)
 
-
 q1 = q(1);
 q2 = q(2);
 % 
@@ -10,14 +9,8 @@ target_pos = target_pos;
 
 %robot = create_robot(DH_T1,DH_T2);
 
-
-
-
-
 figure
 show(robot,qs(1,:)');
-
-
 
 axis([-1,1,-1,1,-1,1]*30);
 %view(2)

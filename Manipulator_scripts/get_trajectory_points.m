@@ -1,12 +1,7 @@
 function [qs, points] = get_trajectory_points(traj, t, T, q,f)
 
 
-
-
-
-
-
-time_steps = (0:0.2:T)'; % Time
+time_steps = (0:0.02:T)'; % Time
 count = length(time_steps); % discrete time intervals
 
  % preallocate memory

@@ -57,10 +57,13 @@ theta_bounds.low = [theta1_min,theta2_min];
 %max torques
 tau1_max = 47;
 tau2_max = 148;
+tau_max=[tau1_max,tau2_max];
 
-%inertias
-I_m = eye(2)*2e-4;          
-B_m = eye(2)*8.17e-4;
+%  motor inertia (motor referred)
+I_m = eye(2)*2e-4;        
+
+% link viscous friction (motor referred) 
+B_m = 8.17e-4;
 
 %tension at max torque
 i_tau1_max = 0.133;   
@@ -69,13 +72,15 @@ i_tau2_max = 0.309;
 % gear reduction
 ni_1 = 125;      
 ni_2 = 100;
+ni = [ni_1,ni_2];
 
-tauC_max = 1.26e-4;
-tauC_min = -7.09e-4;
+%static frictions
+tauC_plus = 1.26e-4;
+tauC_minus= -7.09e-4;
 
-% friction coefficiets
-v_f = 5;     %viscous
-c_f = 3;     %Coulomb
+% dinamic friction coefficiets
+% v_f = 5;     %viscous
+% c_f = 3;     %Coulomb
 
 %% DYNAMIC PARAMETERS
 
@@ -89,7 +94,7 @@ c_f = 3;     %Coulomb
 
 %% PLOT PARAMETERS
 
-orbit_ts = 5;
+orbit_ts = 10;
 
 
 
