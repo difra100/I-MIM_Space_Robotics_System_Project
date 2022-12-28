@@ -1,4 +1,4 @@
-function T = timing_law(q,s,t,path,tau_m,tau_max)
+function T = timing_law(q,s,path,tau_m,tau_max)
 
 % Timing law computation
 % The idea is that you get the function in time of the torque erogated by
@@ -13,7 +13,7 @@ tau_val_best = [0,0];
 for i = 1:count
    s_i = time_steps(i);
    q_i = subs(path,s,s_i)';
-   tau_vals = subs(tau_m,q,q_i);
+   tau_vals = subs(tau_m,q',q_i);
    tau_vals = subs(tau_vals,s,s_i);
    for j=1:2
        if abs(tau_vals(j))>tau_val_best(j) 
@@ -25,7 +25,7 @@ end
 % Let's get the time scaling factor necessary to saturate the joints'torque to
 % the boundaries (the most violated), which would be used to compute the timing law
 scaling = max([tau_val_best(1)/tau_max(1), ...
-                    tau_val_best(2)/tau_max(2)])
+                    tau_val_best(2)/tau_max(2)]);
 time_scaling = sqrt(scaling);
     
 % Motor torques before reduction (motor side)

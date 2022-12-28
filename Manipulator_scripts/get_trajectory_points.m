@@ -1,19 +1,24 @@
-function [qs, points] = get_trajectory_points(traj, t, T, q,f)
+function [qs,dqs,ddqs, points] = get_trajectory_points(traj_q,traj_dq,traj_ddq, t,time_steps, q,f)
 
-
-time_steps = (0:0.02:T)'; % Time
 count = length(time_steps); % discrete time intervals
 
  % preallocate memory
 qs = zeros(count, 2); 
+dqs = zeros(count, 2); 
+ddqs = zeros(count, 2); 
 points = zeros(count, 3);
-q1 = q(1);
-q2 = q(2);
+% q1 = q(1);
+% q2 = q(2);
 
 for i = 1:count
-    qs(i,:) = subs(traj,t,time_steps(i));
-    points(i,:) = vpa(subs(subs(f,q1,qs(i,1)),q2,qs(i,2)),2);
+    qs(i,:) = subs(traj_q,t,time_steps(i));
+    points(i,:) = subs(f,q',qs(i,:));
+    dqs(i,:) = subs(traj_dq,t,time_steps(i));
+    ddqs(i,:) = subs(traj_ddq,t,time_steps(i));
 end
+
+
+
 
 end
 

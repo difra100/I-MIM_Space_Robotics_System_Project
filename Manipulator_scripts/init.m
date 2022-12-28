@@ -82,19 +82,12 @@ tauC_minus= -7.09e-4;
 % v_f = 5;     %viscous
 % c_f = 3;     %Coulomb
 
-%% DYNAMIC PARAMETERS
-
-
-
-
-
-% Inertia matrices
-%I1 = eye(3);
-%I2 = eye(3);
-
 %% PLOT PARAMETERS
+orbit_ts = 1;
 
-orbit_ts = 10;
+%% FREQUENCIES
+sampling_rate = 20;
+
 
 
 

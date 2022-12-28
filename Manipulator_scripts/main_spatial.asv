@@ -188,14 +188,20 @@ for i = 1:count_steps
     dqi = dqss(i,:)';
     ddqi = ddqss(i,:)';
     
-    % Compute all dynamic components in this timestep
+    % Compute all dynamic components in the specific timestep
     M_i = subs(M,q,qi);
     V_i = subs(V,q,qi);
     V_i = subs(V_i,dq,dqi);
     tau_c = [(1 + sign(dqi(1)))/2 *tauC_plus + (1 - sign(dqi(1)))/2 *tauC_minus;
              (1 + sign(dqi(2)))/2 *tauC_plus + (1 - sign(dqi(2)))/2 *tauC_minus];
     J_i = subs(J_L,q,qi);
-   
+    
+    
+    disp(vpa(M_i,2));
+    disp(vpa(V_i,2));
+    disp(vpa(tau_c,2));
+    disp(vpa(J_i,2));
+    disp('-----------------')
 
     %TO DO 
     %Build the controller part in ored to compute the effective
@@ -208,7 +214,8 @@ for i = 1:count_steps
 
     % Finally, get the command in torque using the dynamic model
     % beta = V_i + tau_c;
-    % tau = M_i*command + beta - J_i'*atm_drag;
+    % non_conservative_comp = J_i'*atm_drag;
+    % tau = M_i*command + beta - non_conservative_comp;
 
 end
 
