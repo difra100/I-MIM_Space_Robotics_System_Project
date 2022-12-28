@@ -6,6 +6,7 @@ function q_f = get_target_conf(q,f,f_tip,target,q_bounds, init_guess)
 % Imposing x,y,z = x_tip,y_tip,z_tip (belongs to the rect)
 % Looking for matricial form:
 
+disp('Finding the solution...')
 
 v_1 = target' - f;       % direction from EE to target
 v_2 = target' - f_tip;         % direction of the antenna
@@ -15,8 +16,8 @@ obj = 0.0001*norm(cross(v_1,v_2))^2 + 10*(norm(v_2)/0.001*norm(v_1));
 options = optimoptions('fminunc','Display','final','Algorithm','quasi-newton');
 q_f = init_guess;
 in = init_guess;
-while norm(q_f - in) < 0.1
 
+while norm(q_f - in) < 0.1
 
     fh2 = matlabFunction(obj,'vars',{q}); 
     % fh2 = objective with no gradient or Hessian

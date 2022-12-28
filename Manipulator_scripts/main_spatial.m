@@ -1,6 +1,16 @@
 % I-MIM project - manipulator main
 
+
+%% INSTANTIATIONS
 init;
+verbosity = 2;
+%Verbosity gives what is printed/shown:
+% - 0: Nothing 
+% - 1: kinematic/dynamics components (only)
+% - 2: plots (only)
+% - 3: (1) and (2)
+
+
 
 %% CREATING THE ROBOT
 
@@ -17,18 +27,22 @@ robot = create_robot(l,q_i);
 T_tip = T_EE*trvec2tform([1,0,0]);
 p_tip = T_tip(1:3,4);
 
-% disp('---------------------- Forward kinematics ---------------------')
-% disp(p_EE)
-
-% Jacobian (given p_EE forward kinematics)
-% disp('----------------------- Jacobian matrix -----------------------')
 J_a = analitic_jacobian(p_EE,q');
-% disp('Analitic Jacobian:')
-% disp(vpa(J_a,2))
+
 [J_L,J_A] = geometric_jacobian(DHTABLE,q',['r','r']);
 J_g = [J_L;J_A] ;
-% disp('Geometric Jacobian:')
-% disp(J_g)
+
+
+if (verbosity == 1 || verbosity == 3)
+    fprintf('\n\n---------------------- Kinematics ---------------------')
+    fprintf('\n - Forward kinematics:\n')
+    fprintf('   %s\n',vpa(p_EE,2))
+    fprintf('\n - Analitic Jacobian:\n')
+    fprintf('   %s %s \n',vpa(J_a,2))
+    fprintf('\n - Geometric Jacobian:\n')
+    fprintf('   %s %s\n',vpa(J_g,2))
+end
+
 
 
 %% IMPORTANT TRANSFORMATIONS
@@ -44,13 +58,18 @@ T_o_i = [[R_o_i,[0;0;0]];0 0 0 1]; % LVLH frame -> INERTIA frame
 %% DYNAMIC COMPONENTS
 
 [M, V, B, C] = dynamic_model(q, dq, ddq, m, l, d, I1,I2);
-% disp('------------------------ Inertia matrix ------------------------')
-% disp(vpa(M,3))
-% disp('-----------------Coriolis/centrifucgal terms -------------------')
-% disp(vpa(V,3))
-% disp('---------------- Splitting V in B and C ------------------------')
-% disp(vpa(B,3))
-% disp(vpa(C,3))
+
+if (verbosity == 1 || verbosity == 3)
+    fprintf('\n\n------------------------ Dynamic componets ------------------------')
+    fprintf('\n - Inertia matrix:\n')
+    fprintf('   %s %s \n',vpa(M,3))
+    fprintf('\n - Coreolis and Centrifugal term:\n')
+    fprintf('   %s \n',vpa(V,3))
+    fprintf('\n - Coreolis term:\n')    
+    fprintf('   %s\n',vpa(B,3))
+    fprintf('\n - Centrifugal term:\n')
+    fprintf('   %s %s \n',vpa(C,3))
+end
 
 
 
@@ -102,6 +121,10 @@ ddqss = [];
 pointss = [];
 traj_time = 0;
 
+if (verbosity == 1 || verbosity == 3)
+    fprintf('\n\n ------------------------ Trajectories ---------------------------')
+end
+
 % Get full trajectory
 for i = 1:size(target_poss,2)
     T = 1;     % TO tune when doing bang-cost-bang once in dynamics
@@ -114,9 +137,6 @@ for i = 1:size(target_poss,2)
     path_q = [path_q_1;path_q_2];
     path_dq = [path_dq_1;path_dq_2];
     path_ddq = [path_ddq_1;path_ddq_2];
-
-
-
 
     % Timing law computation: 
     % Tune the T in oder to have the torque boundaries respected and then:
@@ -131,12 +151,15 @@ for i = 1:size(target_poss,2)
 
     s_t = t/T;
     
-%     disp('------------------------ Trajectory ---------------------------')
+    
     traj_q = subs(path_q,s,s_t);
     traj_dq = subs(path_dq,s,s_t);
     traj_ddq = subs(path_ddq,s,s_t);
-%     disp(vpa(traj,2));
 
+    if (verbosity == 1 || verbosity == 3)
+        fprintf('\n - Trajectory %i\n',i)
+        fprintf('   %s\n',vpa(traj_q,2));
+    end
 
     % Discretization
     discr_interval = 1/sampling_rate;
@@ -145,17 +168,19 @@ for i = 1:size(target_poss,2)
                                                   t, time_steps, q, p_EE);
     
     % Plots
-    figure
-    plot(time_steps,qs(:,1),'r',time_steps,qs(:,2),'b')
-    title('Configurations')
-    
-    figure
-    plot(time_steps,dqs(:,1),'r',time_steps,dqs(:,2),'b')
-    title('Velocities')
-    
-    figure
-    plot(time_steps,ddqs(:,1),'r',time_steps,ddqs(:,2),'b')
-    title('Accelerations')
+    if (verbosity == 2 || verbosity == 3)
+        figure
+        plot(time_steps,qs(:,1),'r',time_steps,qs(:,2),'b')
+        title('Configurations of trajectory',i)
+        
+        figure
+        plot(time_steps,dqs(:,1),'r',time_steps,dqs(:,2),'b')
+        title('Velocities of trajectory',i)
+        
+        figure
+        plot(time_steps,ddqs(:,1),'r',time_steps,ddqs(:,2),'b')
+        title('Accelerations of trajectory',i)
+    end
 
     % Concatenation
     q_i = q_f;
@@ -167,8 +192,9 @@ for i = 1:size(target_poss,2)
 
 end
 
-plot_robot_traj(robot, qss, pointss, cell2mat(target_poss(size(target_poss,2))),q,p_EE,p_tip)
-
+if (verbosity == 2 || verbosity == 3)
+    plot_robot_traj(robot, qss, pointss, cell2mat(target_poss(size(target_poss,2))),q,p_EE,p_tip)
+end
 
 
 
@@ -198,8 +224,7 @@ for i = 1:count_steps
    
 
     %TO DO 
-    %Build the controller part in ored to compute the effective
-    %acceleration command...
+    %Build the controller part in ored to compute the effective acc command...
     
     % Get the value of the errors from integration:
     %           e = (qi-q), de = (dqi-dq) 
@@ -209,6 +234,8 @@ for i = 1:count_steps
     % Finally, get the command in torque using the dynamic model
     % beta = V_i + tau_c;
     % tau = M_i*command + beta - J_i'*atm_drag;
+
+    
 
 end
 
