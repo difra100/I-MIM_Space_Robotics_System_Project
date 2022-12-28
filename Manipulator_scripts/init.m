@@ -85,8 +85,11 @@ tauC_minus= -7.09e-4;
 %% PLOT PARAMETERS
 orbit_ts = 1;
 
-%% FREQUENCIES
-sampling_rate = 20;
+%% CONTROL/TRAJECTORY PARAMETERS
+sampling_rate = 20;     % This would determine the discrettization step
+
+k_p=400;            %proportional gain
+k_d=2*sqrt(k_p);    %critical damping
 
 
 

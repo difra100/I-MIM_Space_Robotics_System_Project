@@ -3,14 +3,14 @@
 
 %% INSTANTIATIONS
 init;
+
 verbosity = 2;
 %Verbosity gives what is printed/shown:
 % - 0: Nothing 
 % - 1: kinematic/dynamics components (only)
 % - 2: plots (only)
 % - 3: (1) and (2)
-
-
+fprintf('Verbosity level: %i\n\n',verbosity);
 
 %% CREATING THE ROBOT
 
@@ -54,7 +54,8 @@ end
 R_o_i = [0 0 1;0 -1 0;1 0 0];
 T_o_i = [[R_o_i,[0;0;0]];0 0 0 1]; % LVLH frame -> INERTIA frame
 
-
+fprintf('To get to the Dynamic components press inv \n')
+pause()
 %% DYNAMIC COMPONENTS
 
 [M, V, B, C] = dynamic_model(q, dq, ddq, m, l, d, I1,I2);
@@ -79,7 +80,7 @@ end
 
 % syms tau1 tau2 tau3 tau1_c tau2_c real
 % 
-% atm_drag = [1,1,1]';
+
 % 
 % % friction will depend on the angular velocity of each joint (pos o neg)
 % if dq1 > 0
@@ -104,8 +105,8 @@ end
 % disp(vpa(tau,2))
 
 
-
-
+fprintf('To get to the Trajectories press inv \n')
+pause()
 %% TRAJECTORIES
 syms T real
 syms s real % --> s = t/T in [0,1] (timing law)
@@ -119,7 +120,7 @@ qss = [];
 dqss = [];
 ddqss = [];
 pointss = [];
-traj_time = 0;
+tot_time = 0;
 
 if (verbosity == 1 || verbosity == 3)
     fprintf('\n\n ------------------------ Trajectories ---------------------------')
@@ -155,6 +156,7 @@ for i = 1:size(target_poss,2)
     traj_q = subs(path_q,s,s_t);
     traj_dq = subs(path_dq,s,s_t);
     traj_ddq = subs(path_ddq,s,s_t);
+    tau_m_sub = subs(tau_m,s,s_t);
 
     if (verbosity == 1 || verbosity == 3)
         fprintf('\n - Trajectory %i\n',i)
@@ -163,22 +165,22 @@ for i = 1:size(target_poss,2)
 
     % Discretization
     discr_interval = 1/sampling_rate;
-    time_steps = (0:discr_interval:T)'; 
+    timesteps = (0:discr_interval:T)'; 
     [qs,dqs,ddqs, points] = get_trajectory_points(traj_q,traj_dq,traj_ddq, ...
-                                                  t, time_steps, q, p_EE);
+                                                  t, timesteps, q, p_EE);
     
     % Plots
     if (verbosity == 2 || verbosity == 3)
         figure
-        plot(time_steps,qs(:,1),'r',time_steps,qs(:,2),'b')
+        plot(timesteps,qs(:,1),'r',timesteps,qs(:,2),'b')
         title('Configurations of trajectory',i)
         
         figure
-        plot(time_steps,dqs(:,1),'r',time_steps,dqs(:,2),'b')
+        plot(timesteps,dqs(:,1),'r',timesteps,dqs(:,2),'b')
         title('Velocities of trajectory',i)
         
         figure
-        plot(time_steps,ddqs(:,1),'r',time_steps,ddqs(:,2),'b')
+        plot(timesteps,ddqs(:,1),'r',timesteps,ddqs(:,2),'b')
         title('Accelerations of trajectory',i)
     end
 
@@ -188,7 +190,7 @@ for i = 1:size(target_poss,2)
     dqss = [dqss;dqs];
     ddqss = [ddqss;dqs];
     pointss = [pointss; points];
-    traj_time = traj_time +T;
+    tot_time = tot_time +T;
 
 end
 
@@ -196,8 +198,8 @@ if (verbosity == 2 || verbosity == 3)
     plot_robot_traj(robot, qss, pointss, cell2mat(target_poss(size(target_poss,2))),q,p_EE,p_tip)
 end
 
-
-
+fprintf('To get to the Control part press inv \n')
+pause()
 %% CONTROLLER
 
 % You receive a trajectory (traj_q, traj_dq, traj_ddq) in discrete time.
@@ -206,8 +208,16 @@ end
 % Continuing, you do the rest ofthe stuff by integrating the error bla bla
 % bla.
 
-time_steps = (0:discr_interval:traj_time)'; 
-count_steps = length(time_steps);
+atm_drag = [1,1,1]';        % real one is needed
+
+
+
+timesteps = (0:discr_interval:tot_time)'; 
+count_steps = length(timesteps);
+
+commads = zeros(count_steps,2);
+taus = zeros(count_steps,2);
+
 
 for i = 1:count_steps
     qi = qss(i,:)';
@@ -226,21 +236,40 @@ for i = 1:count_steps
     %TO DO 
     %Build the controller part in ored to compute the effective acc command...
     
-    % Get the value of the errors from integration:
+    % Get the value of the errors from integration (as done in IDA_control):
     %           e = (qi-q), de = (dqi-dq) 
     % and then compute the command in acceleration
-    %           command = ddq_i + K_d*de + K_p*e
+    %           command = ddq_i + k_d*de + k_p*e
 
     % Finally, get the command in torque using the dynamic model
     % beta = V_i + tau_c;
     % tau = M_i*command + beta - J_i'*atm_drag;
 
+    %Let's try with only the feedforward term:
+    command = ddqi;        % tau primo nelle slide
+    beta = V_i + tau_c;     %linearizing term
+    tau = M_i*command + beta - J_i'*atm_drag;
     
-
+    disturb = randn(2,1)/10;     % disturbo barbino per vedere che succede
+    commads(i,:) = [command + disturb]';
+    taus(i,:) = tau';
+    
 end
 
 
+if (verbosity == 2 || verbosity == 3) 
+    figure
+    plot(timesteps,commads(:,1),'r',timesteps,ddqss(:,1),'r--', ...
+         timesteps,commads(:,2),'b',timesteps,ddqss(:,2),'b--')
+    title('Commands and trajectory acceleration')
+    
+    figure
+    plot(timesteps,taus(:,1),'r',timesteps,taus(:,2),'b')
+    title('Torques')
+end
 
+fprintf('To plot the Robot Motion press inv \n')
+pause()
 
 
 
