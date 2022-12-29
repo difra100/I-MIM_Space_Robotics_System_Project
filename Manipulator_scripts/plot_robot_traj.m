@@ -1,4 +1,4 @@
-function plot_robot_traj(robot, qs, points,target_pos,q,f,f_tip)
+function plot_robot_traj(robot, q_d, points,target_pos,q,f,f_tip)
 
 q1 = q(1);
 q2 = q(2);
@@ -10,7 +10,7 @@ target_pos = target_pos;
 %robot = create_robot(DH_T1,DH_T2);
 
 figure
-show(robot,qs(1,:)');
+show(robot,q_d(1,:)');
 
 axis([-1,1,-1,1,-1,1]*30);
 %view(2)
@@ -33,12 +33,12 @@ patch(x_cube', y_cube', z_cube', 'w');
 
 %------> Antenna
 hold on
-EE_pos = subs(f,q,qs(1,:)');
+EE_pos = subs(f,q,q_d(1,:)');
 scatter3(EE_pos(1),EE_pos(2),EE_pos(3),10,'r','filled');
 
 hold on
 
-tip_pos = subs(f_tip,q,qs(1,:)');
+tip_pos = subs(f_tip,q,q_d(1,:)');
 scatter3(tip_pos(1),tip_pos(2),tip_pos(3),10,'b','filled');
 
 %------> Target (planet) = FULL SPHERE
@@ -49,13 +49,13 @@ scatter3(target_pos(1),target_pos(2),target_pos(3),100,'g','filled');
 %-------> Trajectory
 framesPerSecond = 30;
 r = rateControl(framesPerSecond);
-for i = 1:size(qs,1)
-    show(robot,qs(i,:)','PreservePlot',false);
+for i = 1:size(q_d,1)
+    show(robot,q_d(i,:)','PreservePlot',false);
     drawnow
-    EE_pos = subs(f,q,qs(i,:)');
+    EE_pos = subs(f,q,q_d(i,:)');
     scatter3(EE_pos(1),EE_pos(2),EE_pos(3),20,'r','filled');
   
-    tip_pos = subs(f_tip,q,qs(i,:)');
+    tip_pos = subs(f_tip,q,q_d(i,:)');
     scatter3(tip_pos(1),tip_pos(2),tip_pos(3),10,'b','filled');
 
     waitfor(r);

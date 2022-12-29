@@ -73,6 +73,8 @@ if (verbosity == 1 || verbosity == 3)
     fprintf('   %s %s \n',vpa(C,3))
 end
 
+tau_c= [(1 + sign(dq(1)))/2 *tauC_plus + (1 - sign(dq(1)))/2 *tauC_minus;
+        (1 + sign(dq(2)))/2 *tauC_plus + (1 - sign(dq(2)))/2 *tauC_minus];
 
 
 
@@ -131,8 +133,8 @@ end
 for i = 1:size(target_poss,2)
     T = 1;     % TO tune when doing bang-cost-bang once in dynamics
 
-    [q_f] = get_target_conf(q,p_EE,p_tip,cell2mat(target_poss(i)),theta_bounds, q_i);
-
+    q_f = get_target_conf(q,p_EE,p_tip,cell2mat(target_poss(i)),theta_bounds, q_i);
+    
     % Path planning
     [path_q_1, path_dq_1,path_ddq_1] = path_planning(q_i(1), q_f(1), 0, 0, 0, 0,s);
     [path_q_2, path_dq_2,path_ddq_2] = path_planning(q_i(2), q_f(2), 0, 0, 0, 0,s);
@@ -195,14 +197,13 @@ for i = 1:size(target_poss,2)
 
 end
 
-if (verbosity == 2 || verbosity == 3)
-    plot_robot_traj(robot, qss, pointss, cell2mat(target_poss(size(target_poss,2))),q,p_EE,p_tip)
-end
+
 
 fprintf('To get to the Control part press inv \n')
 pause()
 %% CONTROLLER
 
+% NonLinear controller
 % You receive a trajectory (traj_q, traj_dq, traj_ddq) in discrete time.
 % For each timestep you get in the configuration: M, V, tau_c, jacobian.
 % Then, you compute the input tau using the traj_ddq as command in acceleration.
@@ -218,22 +219,23 @@ count_steps = length(timesteps);
 commads = zeros(count_steps,2);
 taus = zeros(count_steps,2);
 
+error = zeros(count_steps,4);
+q_0 = zeros(count_steps,2);
+dq_0 = zeros(count_steps,2);
 
-for i = 1:count_steps
-    qi = qss(i,:)';
-    dqi = dqss(i,:)';
-    ddqi = ddqss(i,:)';
-    
-    % Compute all dynamic components in this timestep
-    M_i = subs(M,q,qi);
-    V_i = subs(V,q,qi);
-    V_i = subs(V_i,dq,dqi);
-    tau_c = [(1 + sign(dqi(1)))/2 *tauC_plus + (1 - sign(dqi(1)))/2 *tauC_minus;
-             (1 + sign(dqi(2)))/2 *tauC_plus + (1 - sign(dqi(2)))/2 *tauC_minus];
-    J_i = subs(J_L,q,qi);
-   
+% first conf/velocity is 'distrurbed'
+q_0(1,:)=qss(1,:)-randn(1,2)*pi/180;
+dq_0(1,:)=dqss(1,:)-randn(1,2)*0.1*pi/180;
 
-    %TO DO 
+q_d = qss;
+dq_d = dqss;
+ddq_d = ddqs;
+trajectory = pointss;
+
+options = odeset('RelTol', 1.0E-4, 'AbsTol', 1.0E-4);
+
+for i = 1:count_steps-1
+    fprintf('Step %i \n',i)
     %Build the controller part in ored to compute the effective acc command...
     
     % Get the value of the errors from integration (as done in IDA_control):
@@ -245,31 +247,55 @@ for i = 1:count_steps
     % beta = V_i + tau_c;
     % tau = M_i*command + beta - J_i'*atm_drag;
 
-    %Let's try with only the feedforward term:
-    command = ddqi;        % tau primo nelle slide
-    beta = V_i + tau_c;     %linearizing term
-    tau = M_i*command + beta - J_i'*atm_drag;
+    e=q_d(i,:)'- q_0(i,:)';
+    de = dq_d(i,:)'- dq_0(i,:)';
+
+    error(i,:) = [e;de];
+    tspan = [timesteps(i) timesteps(i+1)];
+
     
-    disturb = randn(2,1)/10;     % disturbo barbino per vedere che succede
-    commads(i,:) = [command + disturb]';
-    taus(i,:) = tau';
+
+    [t_int,error_int] = ode113(@(time,error)controller(time, error, q_d, dq_d, ddq_d, ...
+                            q,dq, timesteps, k_p, k_d, ...
+                            M, V,tau_c,J_L,atm_drag, ...
+                            M_true,V_true,atm_drag_true), ...
+                            tspan, error(i,:)', options);
     
+    row=length(error_int);
+
+    q_0(i+1,:)=q_d(i+1,:)-error_int(row,1:2);
+    dq_0(i+1,:)=dq_d(i+1,:)-error_int(row,3:4);
+
 end
 
 
 if (verbosity == 2 || verbosity == 3) 
     figure
-    plot(timesteps,commads(:,1),'r',timesteps,ddqss(:,1),'r--', ...
-         timesteps,commads(:,2),'b',timesteps,ddqss(:,2),'b--')
-    title('Commands and trajectory acceleration')
+    plot(timesteps,q_0(:,1),'r',timesteps,q_d(:,1),'r--', ...
+         timesteps,q_0(:,2),'b',timesteps,q_d(:,2),'b--')
+    title('Trajectory traking - Q')
+
+    figure
+    plot(timesteps,dq_0(:,1),'r',timesteps,dq_d(:,1),'r--', ...
+         timesteps,dq_0(:,2),'b',timesteps,dq_d(:,2),'b--')
+    title('Trajectory traking - dQ')
     
     figure
-    plot(timesteps,taus(:,1),'r',timesteps,taus(:,2),'b')
-    title('Torques')
+    plot(timesteps,error(:,1),'r',timesteps,error(:,2))
+    title('Errors - Q')
+
+    figure
+    plot(timesteps,error(:,3),'r',timesteps,error(:,4))
+    title('Errors - dQ')
 end
 
 fprintf('To plot the Robot Motion press inv \n')
-pause()
+
+if (verbosity == 2 || verbosity == 3)
+    plot_robot_traj(robot, q_0, trajectory, cell2mat(target_poss(size(target_poss,2))),q,p_EE,p_tip)
+end
+
+
 
 
 
