@@ -1,4 +1,4 @@
-function T = timing_law(q,s,path,tau_m,tau_max)
+function time_scaling = timing_law(q,s,path,tau_m,tau_max)
 
 % Timing law computation
 % The idea is that you get the function in time of the torque erogated by
@@ -28,8 +28,6 @@ scaling = max([tau_val_best(1)/tau_max(1), ...
                     tau_val_best(2)/tau_max(2)]);
 time_scaling = sqrt(scaling);
     
-% Motor torques before reduction (motor side)
-T = time_scaling;
 
 % Define the timimg laws (s(t))
  

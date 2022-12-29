@@ -13,33 +13,61 @@ ddq = [ddq1,ddq2]';
 radius = 0.1;
 thickness = 0.001;
 inner_radius = radius - thickness;
-density = 2;
+density = 2000;     %kq/m^3
+
+% tollerances
+tollerance_l = 0.001;
+tollerance_rad = 0.0001;
+tollerance_thick = 0.000001;
+
+% true values
+radius_true = radius + randn(1)*tollerance_rad;
+thickness_true = thickness + randn(1)*tollerance_thick;
+inner_radius_true = radius_true - thickness_true;
+
 
 %lengths
 l1 = 7;
 l2 = 5;
 l= [l1,l2];
+l_true = l + randn(1,2)*tollerance_l;
 
 % CoMs (assuming the liks have uniform mass distribution)
 d1 = [cos(q1)*l1/2; sin(q1)*l1/2;0];
 d2 = [cos(q1)*l1+ cos(q2)*l2/2; sin(q1)*l1+ sin(q2)*l2/2;0];
 d= [d1,d2];
+d1_true = [cos(q1)*l_true(1)/2; sin(q1)*l_true(1)/2;0];
+d2_true = [cos(q1)*l_true(1)+ cos(q2)*l_true(2)/2; sin(q1)*l_true(1)+ sin(q2)*l_true(2)/2;0];
+d_true= [d1_true,d2_true];
+
 
 % masses
-m1 = 2*radius*pi*l1*thickness*density;
-m2 = 2*radius*pi*l2*thickness*density;
+m1 = 2*pi*radius*l1*thickness*density;
+m2 = 2*pi*radius*l2*thickness*density;
 m = [m1,m2];
+m1_true = 2*pi*radius_true*l1*thickness_true*density;
+m2_true = 2*pi*radius_true*l2*thickness_true*density;
+m_true = [m1_true,m2_true];
+
 
 % Inertias  (OK Inerzie - Tommaso)
 I1xx = (m1*(radius^2 + inner_radius^2))/2;
 I1yy = (m1*(3*(radius^2 + inner_radius^2)+l1^2))/12;
 I1zz = I1yy;
 I1 = [I1xx,I1yy,I1zz];
-
 I2xx = (m2*(radius^2 + inner_radius^2))/2;
 I2yy = (m2*(3*(radius^2 + inner_radius^2)+l2^2))/12;
 I2zz = I2yy;
 I2 = [I2xx,I2yy,I2zz];
+
+I1xx_true = (m1_true*(radius_true^2 + inner_radius_true^2))/2;
+I1yy_true = (m1_true*(3*(radius_true^2 + inner_radius_true^2)+l_true(1)^2))/12;
+I1zz_true = I1yy_true;
+I1_true = [I1xx_true,I1yy_true,I1zz_true];
+I2xx_true = (m2_true*(radius_true^2 + inner_radius_true^2))/2;
+I2yy_true = (m2_true*(3*(radius_true^2 + inner_radius_true^2)+l_true(2)^2))/12;
+I2zz_true = I2yy_true;
+I2_true = [I2xx_true,I2yy_true,I2zz_true];
 
 
 

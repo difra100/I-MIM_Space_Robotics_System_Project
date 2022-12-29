@@ -59,6 +59,7 @@ pause()
 %% DYNAMIC COMPONENTS
 
 [M, V, B, C] = dynamic_model(q, dq, ddq, m, l, d, I1,I2);
+[M_true, V_true, B_true, C_true] = dynamic_model(q, dq, ddq, m_true, l_true, d_true, I1_true,I2_true);
 
 if (verbosity == 1 || verbosity == 3)
     fprintf('\n\n------------------------ Dynamic componets ------------------------')
@@ -156,7 +157,7 @@ for i = 1:size(target_poss,2)
     traj_q = subs(path_q,s,s_t);
     traj_dq = subs(path_dq,s,s_t);
     traj_ddq = subs(path_ddq,s,s_t);
-    tau_m_sub = subs(tau_m,s,s_t);
+%     tau_m_sub = subs(tau_m,s,s_t);
 
     if (verbosity == 1 || verbosity == 3)
         fprintf('\n - Trajectory %i\n',i)
@@ -205,12 +206,11 @@ pause()
 % You receive a trajectory (traj_q, traj_dq, traj_ddq) in discrete time.
 % For each timestep you get in the configuration: M, V, tau_c, jacobian.
 % Then, you compute the input tau using the traj_ddq as command in acceleration.
-% Continuing, you do the rest ofthe stuff by integrating the error bla bla
+% Continuing, you do the rest of the stuff by integrating the error bla bla
 % bla.
 
-atm_drag = [1,1,1]';        % real one is needed
-
-
+atm_drag = [1,1,1]';        % TODO real one is needed
+atm_drag_true = atm_drag + randn(3,1)/10;
 
 timesteps = (0:discr_interval:tot_time)'; 
 count_steps = length(timesteps);
@@ -239,7 +239,7 @@ for i = 1:count_steps
     % Get the value of the errors from integration (as done in IDA_control):
     %           e = (qi-q), de = (dqi-dq) 
     % and then compute the command in acceleration
-    %           command = ddq_i + k_d*de + k_p*e
+    %           command = ddqi + k_d*de + k_p*e
 
     % Finally, get the command in torque using the dynamic model
     % beta = V_i + tau_c;
