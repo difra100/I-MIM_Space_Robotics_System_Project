@@ -290,7 +290,7 @@ if (verbosity == 2 || verbosity == 3)
 end
 
 fprintf('To plot the Robot Motion press inv \n')
-
+pause()
 if (verbosity == 2 || verbosity == 3)
     plot_robot_traj(robot, q_0, trajectory, cell2mat(target_poss(size(target_poss,2))),q,p_EE,p_tip)
 end
