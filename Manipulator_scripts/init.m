@@ -25,7 +25,6 @@ radius_true = radius + randn(1)*tollerance_rad;
 thickness_true = thickness + randn(1)*tollerance_thick;
 inner_radius_true = radius_true - thickness_true;
 
-
 %lengths
 l1 = 7;
 l2 = 5;
@@ -33,11 +32,11 @@ l= [l1,l2];
 l_true = l + randn(1,2)*tollerance_l;
 
 % CoMs (assuming the liks have uniform mass distribution)
-d1 = [cos(q1)*l1/2; sin(q1)*l1/2;0];
-d2 = [cos(q1)*l1+ cos(q2)*l2/2; sin(q1)*l1+ sin(q2)*l2/2;0];
+d1 = [cos(q1)*l1/2; sin(q1)*l1/2;0];        
+d2 = [cos(q1)*l1+ cos(q2)*l2/2; sin(q1)*l1; -sin(q2)*l2/2];
 d= [d1,d2];
 d1_true = [cos(q1)*l_true(1)/2; sin(q1)*l_true(1)/2;0];
-d2_true = [cos(q1)*l_true(1)+ cos(q2)*l_true(2)/2; sin(q1)*l_true(1)+ sin(q2)*l_true(2)/2;0];
+d2_true = [cos(q1)*l_true(1)+cos(q2)*l_true(2)/2; sin(q1)*l_true(1)+sin(q2)*l_true(2)/2;0];
 d_true= [d1_true,d2_true];
 
 
@@ -48,7 +47,6 @@ m = [m1,m2];
 m1_true = 2*pi*radius_true*l1*thickness_true*density;
 m2_true = 2*pi*radius_true*l2*thickness_true*density;
 m_true = [m1_true,m2_true];
-
 
 % Inertias  (OK Inerzie - Tommaso)
 I1xx = (m1*(radius^2 + inner_radius^2))/2;
@@ -118,6 +116,24 @@ sampling_rate = 20;     % This would determine the discrettization step
 
 k_p=400;            %proportional gain
 k_d=2*sqrt(k_p);    %critical damping
+
+
+%% SPACECRAFT PARAMETERS
+
+% % starlink dimensions
+% volume_starlink = 3.2*1.6*0.2;  %m^3
+% mass_starlink = 250;    %kg
+% density_starlink = mass_starlink/volume_starlink;  %kg/m^3
+% 
+% % Cubesat
+% density_cubesat = 1330; %kg/m^3
+% 
+% density_s = (density_starlink + density_cubesat)/2;
+
+% Using the same density:
+m_s = 500;  %Kg
+% L_s = (m_s/density_s)^(1/3); 
+L_s = 1;   %m
 
 
 
