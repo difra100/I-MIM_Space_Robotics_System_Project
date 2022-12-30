@@ -224,8 +224,8 @@ q_0 = zeros(count_steps,2);
 dq_0 = zeros(count_steps,2);
 
 % first conf/velocity is 'distrurbed'
-q_0(1,:)=qss(1,:)-randn(1,2)*pi/180;
-dq_0(1,:)=dqss(1,:)-randn(1,2)*0.1*pi/180;
+q_0(1,:)=qss(1,:)-randn(1,2)*10*pi/180;
+dq_0(1,:)=dqss(1,:)-randn(1,2)*pi/180;
 
 q_d = qss;
 dq_d = dqss;
