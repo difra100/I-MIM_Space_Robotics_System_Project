@@ -135,6 +135,10 @@ m_s = 500;  %Kg
 % L_s = (m_s/density_s)^(1/3); 
 L_s = 1;   %m
 
+drag_coeff = 0.3; % http://www.personal.psu.edu/faculty/c/x/cxc11/papers/steady_Antenna_CC.PDF (turbulent flow) laminar : 1.2
+Area_Antenna = 9*pi;
+mars_density = 10^-14; % Assumed to be constant
+spacecraft_velocity = [0; 1000; 0]; % about 1000 m/s on the y direction. 
 
 
 

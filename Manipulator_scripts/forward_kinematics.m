@@ -30,7 +30,7 @@ end
 T = eye(4); 
 for i=1:N
     T = T*A{i};
-    T = simplify(T);
+%     T = simplify(T)
 end
 
 T_0N = T_i_b*T;    % final Transformation matrix (roto-translation)

@@ -54,6 +54,10 @@ end
 R_o_i = [0 0 1;0 -1 0;1 0 0];
 T_o_i = [[R_o_i,[0;0;0]];0 0 0 1]; % LVLH frame -> INERTIA frame
 
+dx=2;
+T_i_b= DHMatrix([-pi/2,dx,dx,0]); % Inertia frame -> base frame
+
+
 fprintf('To get to the Dynamic components press inv \n')
 pause()
 %% DYNAMIC COMPONENTS
@@ -116,7 +120,7 @@ syms s real % --> s = t/T in [0,1] (timing law)
 
 target_poss = get_targets(orbit_ts, 'earth');
 
-q_i = [pi;0];     
+q_i = [0;0];     
 
 % To cumulate points
 qss = [];
@@ -133,7 +137,7 @@ end
 for i = 1:size(target_poss,2)
     T = 1;     % TO tune when doing bang-cost-bang once in dynamics
 
-    q_f = get_target_conf(q,p_EE,p_tip,cell2mat(target_poss(i)),theta_bounds, q_i);
+    q_f = get_target_conf(cell2mat(target_poss(i)),theta_bounds, q_i, l);
     
     % Path planning
     [path_q_1, path_dq_1,path_ddq_1] = path_planning(q_i(1), q_f(1), 0, 0, 0, 0,s);
@@ -198,6 +202,9 @@ for i = 1:size(target_poss,2)
 end
 
 
+if (verbosity == 2 || verbosity == 3)
+    plot_robot_traj(robot, qss, pointss, cell2mat(target_poss(size(target_poss,2))),q,p_EE,p_tip)
+end
 
 fprintf('To get to the Control part press inv \n')
 pause()
@@ -210,8 +217,10 @@ pause()
 % Continuing, you do the rest of the stuff by integrating the error bla bla
 % bla.
 
-atm_drag = [1,1,1]';        % TODO real one is needed
-atm_drag_true = atm_drag + randn(3,1)/10;
+space_craft_velocity_base = T_i_b*T_o_i*[spacecraft_velocity;1];  % Spacecraft velocity expressed in the base frame 
+
+atm_drag_fixed = (1/2) * drag_coeff * mars_density * Area_Antenna;        % without velocity = 1/2 * C_p * density * A
+
 
 timesteps = (0:discr_interval:tot_time)'; 
 count_steps = length(timesteps);
@@ -252,8 +261,13 @@ for i = 1:count_steps-1
 
     error(i,:) = [e;de];
     tspan = [timesteps(i) timesteps(i+1)];
-
     
+    ee_vel = J_L*dq_d(i,:)';
+    tot_vel = ee_vel + space_craft_velocity_base(1:3,:);
+
+    atm_drag = atm_drag_fixed*(tot_vel.^2);
+
+    atm_drag_true = atm_drag + [0;randn(1)*10^-2;0];
 
     [t_int,error_int] = ode113(@(time,error)controller(time, error, q_d, dq_d, ddq_d, ...
                             q,dq, timesteps, k_p, k_d, ...
