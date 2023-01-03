@@ -1,4 +1,4 @@
-clear all
+
 % All initialization for the fixed base banipulator part
 
 %% SYMBOLIC VARIABLES

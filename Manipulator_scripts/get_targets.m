@@ -3,13 +3,13 @@ function [target_cell] = get_targets(len, type)
 % 
 
 
+R = [0 0 1;  % This rotation brings the LVLH frame to the Inertia frame.
+    0 -1 0;
+    1 0 0];
+
 skiprow = 0;    
 target_cell = {};
-if type == 'earth'  % This is to get the array for the earth pointing
-
-    R = [0 0 1;  % This rotation brings the LVLH frame to the Inertia frame.
-        0 -1 0;
-        1 0 0];
+if type == 0  % This is to get the array for the earth pointing
 
     path = './data/earth_pos_data.txt';
     
@@ -22,6 +22,21 @@ if type == 'earth'  % This is to get the array for the earth pointing
         target_cell{i} = new_point;
         i= i + 1;
     end
+end
+
+if type == 1
+
+    path = './data/MARS_LVLH.mat';
+    z = load(path);
+    i = 1;
+    while size(target_cell, 2) < len
+        
+        point = [0; 0; z.MARS_LVLH(i)];
+        new_point = R*point;
+        target_cell{i} = new_point;
+        i= i + 1;
+    end
+
 end
 
 

@@ -24,6 +24,7 @@ v_1 = target - f;       % direction from EE to target
 v_2 = target - f_tip;         % direction of the antenna
 
 obj = norm(cross(v_1,v_2))^2 %+ 10*(norm(v_2)/0.001*norm(v_1));
+
 prob = optimproblem("Objective", obj, 'ObjectiveSense', 'min');
 prob.Constraints.c1 = -v_2'*v_1 <= 0; 
 q0.q_1 = init_guess(1);
