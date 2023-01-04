@@ -3,8 +3,6 @@ function [target_cell] = get_targets(len, type)
 % 
 
 
-
-
 skiprow = 0;    
 target_cell = {};
 if type == 0  % This is to get the array for the earth pointing

@@ -12,14 +12,22 @@ N = 3;
 m = [M,m_links];
 M_tot = sum(m);
 Vg = 0;
-for i=1:N
+k = 0; 
+
+Sum = 0
+for j=1:N
+    Sum = Sum + (R(j, :) + L(j, :));
+end
+Vg = (c_n-Sum')*(M/M_tot);
+
+for i=2:N
     Sum = 0;
     for j=i:N
-        Sum = Sum + (R(j)+L(j+1));
+        Sum = Sum + (R(j,:)+L(j,:));
     end
-    Vg = Vg + (c_n - Sum)*m(i)/M_tot;
-end
 
+    Vg = Vg + (c_n - Sum')*m(i)/M_tot;
+end
 end
 
 

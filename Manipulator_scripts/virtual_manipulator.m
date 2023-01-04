@@ -1,4 +1,4 @@
-function V = virtual_manipulator(Vg,R,L,m_links,M)
+function [V, Vs] = virtual_manipulator(Vg,R,L,m_links,M)
 
 % INPUTS:
 % - Vg: virtual ground
@@ -11,17 +11,21 @@ function V = virtual_manipulator(Vg,R,L,m_links,M)
 N = 3;
 m = [M,m_links];
 M_tot = sum(m);
-V = zeros(1,N+1);
-r_0 = R(1)*M/M_tot;
-V(1,1:2) = [Vg,r_0];
+
+r_0 = R(1,:)*M/M_tot;
+Vs = [Vg r_0'];
 
 for i=2:N
-    Sum_r=sum(m(1:i))/M_tot;
+    Sum_r=sum(m(1:i))/M_tot;  
     Sum_l=sum(m(1:i-1))/M_tot;
-    r_i = R(i)*Sum_r;
-    l_i = L(i)*Sum_l;
-    V_i = r_i+l_i;
-    V(1,i+2) = V_i;
+    r_i = R(i,:)*Sum_r;
+    l_i = L(i-1,:)*Sum_l;
+    V_i = r_i'+l_i';
+
+    Vs(1:3, end+1) = V_i;
 end
+
+V = sum(Vs,2);
+
 
 end

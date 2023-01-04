@@ -1,5 +1,5 @@
 % I-MIM project - manipulator main
-
+clear all
 
 %% INSTANTIATIONS
 init;
@@ -18,7 +18,7 @@ fprintf('Verbosity level: %i\n\n',verbosity);
 
 [DHTABLE,T_lvlh_b]= DH_generator(l,q);
 
-q_i =[0;0];
+q_i =[0;pi/2];
 robot = create_robot(l,q_i);
 
 
@@ -52,8 +52,6 @@ end
 
 % dx=2;
 % T_lvlh_b= DHMatrix([-pi/2,dx,dx,0]); % Inertia frame -> base frame
-dx=2;
-T_lvlh_b = rotm2tform(elem_rot_mat('x', -pi/2)*elem_rot_mat('z', pi/4))*trvec2tform([0,0,dx/2]);  % DHMatrix([-pi/2,dx,dx,0]); 
 
 fprintf('To get to the Dynamic components press inv \n')
 pause()
@@ -79,7 +77,6 @@ tau_c= [(1 + sign(dq(1)))/2 *tauC_plus + (1 - sign(dq(1)))/2 *tauC_minus;
 
 
 
-
 %% DYNAMIC MODEL
 
 % syms tau1 tau2 tau3 tau1_c tau2_c real
@@ -93,8 +90,6 @@ tau_c= [(1 + sign(dq(1)))/2 *tauC_plus + (1 - sign(dq(1)))/2 *tauC_minus;
 % tau = conservative_comp - non_conservative_comp;
 % disp('tau:')
 % disp(vpa(tau,2))
-
-
 fprintf('To get to the Trajectories press inv \n')
 pause()
 % TRAJECTORIES
@@ -104,7 +99,6 @@ mars_target = get_targets(orbit_ts, 1);   % Extracting the first #orbit_ts point
 earth_target = get_targets(orbit_ts, 0); % Extracting the first #orbit_ts points of earth position (ts: time samples)
 
 
-q_i = [0;0];     
 
 % To cumulate points
 q_ss = [];
@@ -140,10 +134,10 @@ disp(' Earth pointing trajectory ')
 
 
 
-% 
-% if (verbosity == 2 || verbosity == 3)
-%     plot_robot_traj(robot, q_ss, pointss, cell2mat(mars_target(size(mars_target,2))),q,p_EE,p_tip);
-% end
+
+if (verbosity == 2 || verbosity == 3)
+    plot_robot_traj(robot, q_ss, pointss, cell2mat(mars_target(size(mars_target,2))),q,p_EE,p_tip);
+end
 
 fprintf('To get to the Control part press inv \n')
 pause()
@@ -269,22 +263,46 @@ if (verbosity == 2 || verbosity == 3)
 end
 
 
+%% Virtual Manipulator Section 
 
+time_instant = 1; % First instant to compute the virtual ground position 
 
+T_Lvlh_j2000 = get_attitude(time_instant); % Get Satellite's attitude, (from LVLH to j2000) 
 
+c_2_b = d2;  % Center of mass of the second joint (c_N, where N = 2)
 
+T_b_j2000 = T_Lvlh_j2000*inv(T_lvlh_b);
 
+R_0_j2000 = T_Lvlh_j2000*inv(T_lvlh_b)*[0;0;0;1];  % manipulator base position, in the satellite reference frame
+R_0_j2000 = R_0_j2000(1:3);
 
+c_2_j2000 = T_b_j2000*[c_2_b;1];
+c_2_j2000 = c_2_j2000(1:3);
 
-
-
-
-
+p1_b = [0;0;l1];
 % 
-% 
+d1_j2000 = T_b_j2000*[d1;1];
+d1_j2000 = d1_j2000(1:3);
+
+d2_j2000 = T_b_j2000*[d2;1];
+d2_j2000 = d2_j2000(1:3);
+
+p1_j2000 = T_b_j2000*[p1_b;1];
+p1_j2000 = p1_j2000(1:3);
+
+p_EE_j2000 = T_b_j2000*[p_EE;1];
+p_EE_j2000 = p_EE_j2000(1:3);
+
+L_ = [d1_j2000'; (d2_j2000- p1_j2000)'; [0;0;0]'];
+R_ = [R_0_j2000';(p1_j2000 - d1_j2000)'; (p_EE_j2000-d2_j2000)']
+
+vg = virtual_ground(c_2_j2000, R_, L_, m, m_s);
+[virtual_M, Vs] = virtual_manipulator(vg, R_, L_, m, m_s);
 
 
-
-
+disp(' Virtual E-E position:  ')
+vpa(norm(subs(virtual_M, q, q_i)), 6)
+disp(' Real E-E position:  ')
+vpa(norm(subs(p_EE_j2000, q, q_i)), 6)
 
 
