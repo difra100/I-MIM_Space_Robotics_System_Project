@@ -32,14 +32,18 @@ l= [l1,l2];
 l_true = l + randn(1,2)*tollerance_l;
 
 % CoMs (assuming the liks have uniform mass distribution)
-d1 = [cos(q1)*l1/2; sin(q1)*l1/2;0];        
-d2 = [cos(q1)*l1+ cos(q2)*l2/2; sin(q1)*l1; -sin(q2)*l2/2];
-d= [d1,d2];
-d1_true = [cos(q1)*l_true(1)/2; sin(q1)*l_true(1)/2;0];
-d2_true = [cos(q1)*l_true(1)+cos(q2)*l_true(2)/2; sin(q1)*l_true(1)+sin(q2)*l_true(2)/2;0];
+% d1 = [cos(q1)*l1/2; sin(q1)*l1/2;0];        
+% d2 = [cos(q1)*l1+ cos(q2)*l2/2; sin(q1)*l1; -sin(q2)*l2/2];
+
+% d1_true = [cos(q1)*l_true(1)/2; sin(q1)*l_true(1)/2;0];
+% d2_true = [cos(q1)*l_true(1)+cos(q2)*l_true(2)/2; sin(q1)*l_true(1)+sin(q2)*l_true(2)/2;0];
+
+d1 = [0; 0; l1/2];
+d2 = [(l2/2)*cos(q1)*cos(q2); (l2/2)*sin(q1)*cos(q2);l1+ (l2/2)*sin(q1)]; 
+d1_true = [0; 0; l_true(1)/2];
+d2_true = [(l_true(2)/2)*cos(q1)*cos(q2); (l_true(2)/2)*sin(q1)*cos(q2);l_true(1)+ (l_true(2)/2)*sin(q1)]; 
 d_true= [d1_true,d2_true];
-
-
+d= [d1,d2];
 % masses
 m1 = 2*pi*radius*l1*thickness*density;
 m2 = 2*pi*radius*l2*thickness*density;

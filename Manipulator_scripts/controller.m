@@ -7,6 +7,7 @@ e = error(1:2);
 de = error(3:4);
 
 %interpolation
+
 qi_d = interp1(timesteps, q_d, t)';
 dqi_d = interp1(timesteps, dq_d, t)';
 ddqi_d = interp1(timesteps, ddq_d, t)';
