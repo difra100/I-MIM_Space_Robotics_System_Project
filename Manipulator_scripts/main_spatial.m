@@ -16,14 +16,14 @@ fprintf('Verbosity level: %i\n\n',verbosity);
 
 % DH table [alpha_i d_i a_i theta_i] (original method)
 
-[DHTABLE,T_i_b]= DH_generator(l,q);
+[DHTABLE,T_lvlh_b]= DH_generator(l,q);
 
 q_i =[0;0];
 robot = create_robot(l,q_i);
 
 
 %% KINEMATICS
-[T_EE,R_EE,p_EE] = forward_kinematics(DHTABLE,T_i_b);
+[T_EE,R_EE,p_EE] = forward_kinematics(DHTABLE,T_lvlh_b);
 T_tip = T_EE*trvec2tform([1,0,0]);
 p_tip = T_tip(1:3,4);
 
@@ -48,15 +48,12 @@ end
 %% IMPORTANT TRANSFORMATIONS
 
 % T_EE:  BASE frame -> EE frame
-% T_i_b : INERTIA frame -> BASE frame
-% T_o_i:  LVLH frame -> INERTIA frame
+% T_lvlh_b : LVLH frame -> BASE frame
 
-R_o_i = [0 0 1;0 -1 0;1 0 0];
-T_o_i = [[R_o_i,[0;0;0]];0 0 0 1]; % LVLH frame -> INERTIA frame
-
+% dx=2;
+% T_lvlh_b= DHMatrix([-pi/2,dx,dx,0]); % Inertia frame -> base frame
 dx=2;
-T_i_b= DHMatrix([-pi/2,dx,dx,0]); % Inertia frame -> base frame
-
+T_lvlh_b = rotm2tform(elem_rot_mat('x', -pi/2)*elem_rot_mat('z', pi/4))*trvec2tform([0,0,dx/2]);  % DHMatrix([-pi/2,dx,dx,0]); 
 
 fprintf('To get to the Dynamic components press inv \n')
 pause()
@@ -187,7 +184,7 @@ end
 % % Continuing, you do the rest of the stuff by integrating the error bla bla
 % % bla.
 % 
-% space_craft_velocity_base = T_i_b*T_o_i*[spacecraft_velocity;1];  % Spacecraft velocity expressed in the base frame 
+% space_craft_velocity_base = T_lvlh_b*[spacecraft_velocity;1];  % Spacecraft velocity expressed in the base frame 
 % 
 % atm_drag_fixed = (1/2) * drag_coeff * mars_density * Area_Antenna;        % without velocity = 1/2 * C_p * density * A
 % 
