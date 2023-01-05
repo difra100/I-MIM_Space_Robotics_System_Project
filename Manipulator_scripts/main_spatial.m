@@ -18,7 +18,7 @@ fprintf('Verbosity level: %i\n\n',verbosity);
 
 [DHTABLE,T_lvlh_b]= DH_generator(l,q);
 
-q_i =[0;pi/2];
+q_i =[0;0];
 robot = create_robot(l,q_i);
 
 
