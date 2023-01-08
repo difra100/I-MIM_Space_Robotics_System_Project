@@ -8,13 +8,15 @@ function Vg = virtual_ground(c_n,R,L,m_links,M)
 % - M: spacecraft mass
 % OUTPUT: Virtual ground
 
-N = 3;
-m = [M,m_links];
+m_tip = 1;
+
+N = size(R,1);
+m = [M,m_links,m_tip];
 M_tot = sum(m);
 Vg = 0;
 k = 0; 
 
-Sum = 0
+Sum = 0;
 for j=1:N
     Sum = Sum + (R(j, :) + L(j, :));
 end
