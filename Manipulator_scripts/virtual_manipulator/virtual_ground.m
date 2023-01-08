@@ -11,7 +11,7 @@ function Vg = virtual_ground(c_n,R,L,m_links,M)
 m_tip = 1;
 
 N = size(R,1);
-m = [M,m_links,m_tip];
+m = [M,m_links] %,m_tip];
 M_tot = sum(m);
 Vg = 0;
 k = 0; 

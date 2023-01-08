@@ -11,7 +11,7 @@ function [c2_j2000, R_, L_] = get_R_L_VM(T_lvlh_b,T_lvlh_j2000, d, p_j1_lvlh, p_
          % Center of mass of the second joint (c_N, where N = 2)
       
         
-       T_b_j2000 = T_lvlh_j2000/T_lvlh_b;  % from base to j2000
+       T_b_j2000 = T_lvlh_j2000*T_lvlh_b;  % from base to j2000
 
        % Get all positions of CoMs in J2000
        c0_j2000 = T_lvlh_j2000(1:3,4);
@@ -19,16 +19,17 @@ function [c2_j2000, R_, L_] = get_R_L_VM(T_lvlh_b,T_lvlh_j2000, d, p_j1_lvlh, p_
        c1_j2000 = T_b_j2000*[d(:,1);1];
        c1_j2000 = c1_j2000(1:3);
 
-       c2_j2000 = T_b_j2000*[d(:,1);1];
+       c2_j2000 = T_b_j2000*[d(:,2);1];
        c2_j2000 = c2_j2000(1:3);
        
        d_tip = (p_EE_lvlh+p_tip_lvlh)/2;
-       c_tip_j2000 = T_b_j2000*[d_tip;1];
+       c_tip_j2000 = T_lvlh_j2000*[d_tip;1];
        c_tip_j2000 = c_tip_j2000(1:3);
 
        
        % Get all positions of joints in J2000
        p0_j2000 = T_b_j2000(1:3,4);
+       
        p1_j2000 = T_lvlh_j2000*[p_j1_lvlh;1];
        p1_j2000 = p1_j2000(1:3);
        p_EE_j2000 = T_lvlh_j2000*[p_EE_lvlh;1];

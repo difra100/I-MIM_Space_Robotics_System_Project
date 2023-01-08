@@ -20,8 +20,8 @@ fprintf('Verbosity level: %i\n\n',verbosity);
 [DHTABLE, T_lvlh_b_real] = DH_generator(l,q);
 T_lvlh_b = T_lvlh_b_real*[rpy_rotation('xyz', theta_v'), [0;0;0]; 0 0 0 1];
 
- time_instant = 1; % First instant to compute the virtual ground position 
- T_lvlh_j2000 = get_attitude(time_instant); % Get Satellite's attitude, (from LVLH to j2000) 
+time_instant = 1; % First instant to compute the virtual ground position 
+T_lvlh_j2000 = get_attitude(time_instant); % Get Satellite's attitude, (from LVLH to j2000) 
 
 %% KINEMATICS
 [p_EE,p_tip] = forward_kinematics_VM(d, m, m_s,T_lvlh_b,T_lvlh_j2000,DHTABLE);
@@ -55,9 +55,9 @@ p_EE_j2000 = T_EE_real(1:3,4);
 T_tip_real = T_lvlh_j2000*T_EE_real*trvec2tform([1,0,0]);
 p_tip_j2000 = T_tip_real(1:3,4);
 
-fprintf(' Virtual E-E position: %f \n ',vpa(norm(subs(p_tip, Q_augm, q_i)), 6))
+fprintf(' Virtual E-E position: %f \n ',vpa(norm(subs(p_EE, Q_augm, q_i)), 6))
 
-fprintf(' Real E-E position: %f \n',vpa(norm(subs(p_tip_j2000, Q_augm, q_i)), 6))
+fprintf(' Real E-E position: %f \n',vpa(norm(subs(p_EE_j2000, Q_augm, q_i)), 6))
 
 mars_target = get_targets(orbit_ts, 1);
 earth_target = get_targets(orbit_ts, 0);

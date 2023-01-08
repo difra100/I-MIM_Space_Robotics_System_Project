@@ -9,7 +9,7 @@ function [V_EE,V_tip, Vs] = virtual_manipulator(Vg,R,L,m_links,M)
 % OUTPUT: Virtual manipulator vector chain
 m_tip = 1.0;
 N = size(R,1);
-m = [M,m_links,m_tip];
+m = [M,m_links]; %,m_tip];
 M_tot = sum(m);
 
 r_0 = R(1,:)*M/M_tot;
