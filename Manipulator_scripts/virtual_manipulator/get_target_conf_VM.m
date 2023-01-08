@@ -13,7 +13,7 @@ q_1 = optimvar('q_1',1,'LowerBound',q_bounds.low(1),'UpperBound',q_bounds.high(1
 q_2 = optimvar('q_2',1,'LowerBound',q_bounds.low(2),'UpperBound',q_bounds.high(2));
 
 qq = [theta1; theta2; theta3; q_1; q_2];
-[VM_direct_kinematics,T_lvlh_b, T_EE] = DH_generator_VM(l, qq(4:5), qq(1:3), true, m, m_s)
+[VM_direct_kinematics,T_lvlh_b, T_EE] = forward_kinematics_VM(l, qq(4:5), qq(1:3), true, m, m_s)
 T_tip = T_EE*trvec2tform([1,0,0]);
 f_tip = T_tip(1:3,4);
 f = VM_direct_kinematics;
