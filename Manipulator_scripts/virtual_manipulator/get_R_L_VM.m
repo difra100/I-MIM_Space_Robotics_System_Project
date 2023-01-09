@@ -30,7 +30,7 @@ function [c2_j2000, R_, L_] = get_R_L_VM(T_lvlh_b,T_lvlh_j2000, d, ...
        
        % Get all positions of joints in J2000
        p0_j2000 = T_lvlh_j2000*[p_j0_lvlh;1];
-       p0_j2000 = p1_j2000(1:3);
+       p0_j2000 = p0_j2000(1:3);
        p1_j2000 = T_lvlh_j2000*[p_j1_lvlh;1];
        p1_j2000 = p1_j2000(1:3);
        p_EE_j2000 = T_lvlh_j2000*[p_EE_lvlh;1];

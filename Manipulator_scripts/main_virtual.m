@@ -18,11 +18,11 @@ fprintf('Verbosity level: %i\n\n',verbosity);
 % Get the original DHtable and modifying the mapping from LVLH to the base 
 % frame in order to include the new Dofs from the spaceCraft
 
-DHtable = [ pi/2 0 0 Q_aug(1); % --> first DoF of the spacecraft
-           -pi/2 0 0 Q_aug(2); % --> second DoF of the spacecraft
-            0 0 L_s/2 Q_aug(3);   % --> third DoF of the spacecraft
-            pi/2 0 l(1)  Q_aug(4);
-            0  l(2) 0 Q_aug(5)];
+DHtable = [ pi/2 0 0 Q_augm(1); % --> first DoF of the spacecraft
+           -pi/2 0 0 Q_augm(2); % --> second DoF of the spacecraft
+            0 0 L_s/2 Q_augm(3);   % --> third DoF of the spacecraft
+            pi/2 0 l(1)  Q_augm(4);
+            0  l(2) 0 Q_augm(5)];
 
 time_instant = 1; % First instant to compute the virtual ground position 
 T_lvlh_j2000 = get_attitude(time_instant); % Get Satellite's attitude, (from LVLH to j2000) 
@@ -32,7 +32,7 @@ T_lvlh_j2000 = get_attitude(time_instant); % Get Satellite's attitude, (from LVL
 %% KINEMATICS
 [T_EE_lvlh, ~, p_EE_lvlh,T_lvlh_b,T_j1_lvlh] = forward_kinematics_VM(DHtable);
 % T_j1_lvlh = T_lvlh_b*DHtransf(DHtable(1,:));
-% T_tip_lvlh = T_EE_lvlh*trvec2tform([1,0,0]);
+T_tip_lvlh = T_EE_lvlh*trvec2tform([1,0,0]);
 p_j0_lvlh = T_lvlh_b(1:3,4);
 p_j1_lvlh = T_j1_lvlh(1:3,4);
 p_tip_lvlh = T_tip_lvlh(1:3,4);
@@ -41,25 +41,25 @@ p_tip_lvlh = T_tip_lvlh(1:3,4);
     
 vg = virtual_ground(c_2_j2000, R_, L_, m, m_s);
 
-[~,r_,l_] = virtual_manipulator(vg, R_, L_, m, m_s); % Here DHtable is the virtual manipulator forward kinematics.
+[~,r_,l_] = virtual_manipulator(vg, R_, L_, m, m_s); 
 
 L0 = norm(r_(1));
 L1 = norm(r_(2)+l_(2));
 L2 = norm(r_(3)+l_(3));
 
-DHtable_VM = [ pi/2 0 0 Q_aug(1);
-               -pi/2 0 0 Q_aug(2);
-                0 0 L0 Q_aug(3);
-                pi/2 0 L1  Q_aug(4) ;
-                0  L2 0 Q_aug(5)];
+DHtable_VM = [ pi/2 0 0 Q_augm(1);
+               -pi/2 0 0 Q_augm(2);
+                0 0 L0 Q_augm(3);
+                pi/2 0 L1  Q_augm(4) ;
+                0  L2 0 Q_augm(5)];
 
-[T_VM, R_VM, p_VM,~,~] = forward_kinematics_VM(DHtable_VM);
+[T_VM, R_VM, p_VM,~,~] = forward_kinematics_VM(DHtable_VM)
 
 
-J_a = analitic_jacobian(p_EE,q');
-
-[J_L,J_A] = geometric_jacobian(DHTABLE,q',['r','r']);
-J_g = [J_L;J_A] ;
+% J_a = analitic_jacobian(p_EE,q');
+% 
+% [J_L,J_A] = geometric_jacobian(DHTABLE,q',['r','r']);
+% J_g = [J_L;J_A] ;
 
 
 if (verbosity == 1 || verbosity == 3)
@@ -77,14 +77,14 @@ end
 q_i = [0,0,0,0,0]';
 
 
-[T_EE_real,~,~] = forward_kinematics(DHTABLE,T_lvlh_b);
+[T_EE_real,~,~] = forward_kinematics(DHtable,T_lvlh_b);
 
 T_EE_real = T_lvlh_j2000*T_EE_real;
 p_EE_j2000 = T_EE_real(1:3,4);
 T_tip_real = T_lvlh_j2000*T_EE_real*trvec2tform([1,0,0]);
 p_tip_j2000 = T_tip_real(1:3,4);
 
-fprintf(' Virtual E-E position: %f \n ',vpa(norm(subs(p_EE, Q_augm, q_i)), 6))
+fprintf(' Virtual E-E position: %f \n ',vpa(norm(subs(p_VM, Q_augm, q_i)), 6))
 
 fprintf(' Real E-E position: %f \n',vpa(norm(subs(p_EE_j2000, Q_augm, q_i)), 6))
 

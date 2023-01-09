@@ -13,8 +13,8 @@ M_tot = sum(m);
 
 r_0 = R(1,:)*M/M_tot;
 Vs = [Vg r_0'];
-l_ = [0;0;0];
-r_ = r_0';
+l_ = [0;0;0]
+r_ = r_0'
 
 for i=2:N
     Sum_r=sum(m(1:i))/M_tot;  
@@ -22,7 +22,7 @@ for i=2:N
     r_i = R(i,:)*Sum_r;
     r_(1:3, end+1) = r_i';
     l_i = L(i-1,:)*Sum_l;
-    l_(1:3, end+1) = l_i';
+    l_ = [l_ l_i'];
     V_i = r_i'+l_i';
 
     Vs(1:3, end+1) = V_i;
