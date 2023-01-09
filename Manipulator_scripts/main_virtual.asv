@@ -18,26 +18,21 @@ fprintf('Verbosity level: %i\n\n',verbosity);
 % Get the original DHtable and modifying the mapping from LVLH to the base 
 % frame in order to include the new Dofs from the spaceCraft
 
-DHtable = [ pi/2 0 0 Q_aug(1); % --> first DoF of the spacecraft
-           -pi/2 0 0 Q_aug(2); % --> second DoF of the spacecraft
-            0 0 L_s/2 Q_aug(3);   % --> third DoF of the spacecraft
-            pi/2 0 l(1)  Q_aug(4);
-            0  l(2) 0 Q_aug(5)];
+[DHTABLE, T_lvlh_b] = DH_generator(l,q,L_s);
 
 time_instant = 1; % First instant to compute the virtual ground position 
 T_lvlh_j2000 = get_attitude(time_instant); % Get Satellite's attitude, (from LVLH to j2000) 
 
-
-
 %% KINEMATICS
-[T_EE_lvlh, ~, p_EE_lvlh,T_lvlh_b,T_j1_lvlh] = forward_kinematics_VM(DHtable);
-% T_j1_lvlh = T_lvlh_b*DHtransf(DHtable(1,:));
-% T_tip_lvlh = T_EE_lvlh*trvec2tform([1,0,0]);
-p_j0_lvlh = T_lvlh_b(1:3,4);
+[T_EE_lvlh, ~, p_EE_lvlh] = forward_kinematics(DHtable, T_lvlh_b);
+
+T_j1_lvlh = T_lvlh_b*DHtransf(DHtable(1,:));
+T_tip_lvlh = T_EE_lvlh*trvec2tform([1,0,0]);
+
 p_j1_lvlh = T_j1_lvlh(1:3,4);
 p_tip_lvlh = T_tip_lvlh(1:3,4);
 
-[c_2_j2000, R_, L_] = get_R_L_VM(T_lvlh_b, T_lvlh_j2000, d, p_j0_lvlh,p_j1_lvlh,p_EE_lvlh,p_tip_lvlh);
+[c_2_j2000, R_, L_] = get_R_L_VM(T_lvlh_b, T_lvlh_j2000, d, p_j1_lvlh,p_EE_lvlh,p_tip_lvlh);
     
 vg = virtual_ground(c_2_j2000, R_, L_, m, m_s);
 
@@ -53,7 +48,9 @@ DHtable_VM = [ pi/2 0 0 Q_aug(1);
                 pi/2 0 L1  Q_aug(4) ;
                 0  L2 0 Q_aug(5)];
 
-[T_VM, R_VM, p_VM,~,~] = forward_kinematics_VM(DHtable_VM);
+[T_VM, R_VM, p_VM] = forward_kinematics(DHtable_VM,eye(4));
+
+
 
 
 J_a = analitic_jacobian(p_EE,q');
