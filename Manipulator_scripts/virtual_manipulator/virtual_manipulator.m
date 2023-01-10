@@ -1,4 +1,4 @@
-function [V_EE,V_tip, Vs] = virtual_manipulator(Vg,R,L,m_links,M)
+function [Vs, r_,l_] = virtual_manipulator(Vg,R,L,m_links,M)
 
 % INPUTS:
 % - Vg: virtual ground
@@ -7,26 +7,24 @@ function [V_EE,V_tip, Vs] = virtual_manipulator(Vg,R,L,m_links,M)
 % - m_links
 % - M: spacecraft mass
 % OUTPUT: Virtual manipulator vector chain
-m_tip = 1.0;
 N = size(R,1);
-m = [M,m_links]; %,m_tip];
+m = [M,m_links]; 
 M_tot = sum(m);
 
 r_0 = R(1,:)*M/M_tot;
 Vs = [Vg r_0'];
+l_ = [0;0;0];
+r_ = r_0';
 
 for i=2:N
     Sum_r=sum(m(1:i))/M_tot;  
     Sum_l=sum(m(1:i-1))/M_tot;
     r_i = R(i,:)*Sum_r;
+    r_(1:3, end+1) = r_i';
     l_i = L(i-1,:)*Sum_l;
+    l_ = [l_ l_i'];
     V_i = r_i'+l_i';
 
     Vs(1:3, end+1) = V_i;
 end
-
-V_EE = sum(Vs(1:end-1,:),2);
-V_tip = V_EE + Vs(end,:);
-
-
 end

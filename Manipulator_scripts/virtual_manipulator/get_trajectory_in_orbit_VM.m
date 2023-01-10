@@ -1,4 +1,7 @@
-function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit_VM(q_i, q_ss, dq_ss, ddq_ss, pointss, tot_time, target_poss, M, ni, I_m, B_m, tau_max, position_EE, theta_bounds, l, m, m_s)
+function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit_VM( ...
+    q_i, q_ss, dq_ss, ddq_ss, pointss, tot_time, ...
+    target_poss, M, ni, I_m, B_m, tau_max, ...
+    position_EE, theta_bounds, l_0,l)
     % This function computes the optimal joint configuration in order to
     % point at a certain planet.
     % INPUTs : q_i : Starting configuration, q_ss: time series of the
@@ -11,12 +14,11 @@ function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit
     % OUTPUTs : q_f : Final pointing configuration, the other are the same
         % as before, but now they are computed after the new maneuvre.
 
-    syms T real
     syms s real  % --> s = t/T in [0,1] (timing law)
     for i = 1:size(target_poss,2)
-        T = 1;     % TO tune when doing bang-cost-bang once in dynamics
+        T = 1;     
     
-        q_f = get_target_conf_VM(cell2mat(target_poss(i)),theta_bounds, q_i, l, m, m_s);
+        q_f = get_target_conf_VM(cell2mat(target_poss(i)),theta_bounds, q_i, l_0,l);
         
         % Path planning
         [path_theta_1, path_dtheta_1,path_ddtheta_1] = path_planning(q_i(1), q_f(1), 0, 0, 0, 0,s); % theta1
@@ -24,44 +26,36 @@ function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit
         [path_theta_3, path_dtheta_3,path_ddtheta_3] = path_planning(q_i(3), q_f(3), 0, 0, 0, 0,s); % theta3
         [path_q_1, path_dq_1,path_ddq_1] = path_planning(q_i(4), q_f(4), 0, 0, 0, 0,s); % q1
         [path_q_2, path_dq_2,path_ddq_2] = path_planning(q_i(5), q_f(5), 0, 0, 0, 0,s); % q2
-        path_q = [path_theta_1; path_theta_2; path_theta_3; path_q_1;path_q_2];
-        path_dq = [path_dtheta_1; path_dtheta_2; path_dtheta_3; path_dq_1;path_dq_2];
-        path_ddq = [path_ddtheta_1;path_ddtheta_2;path_ddtheta_3;path_ddq_1;path_ddq_2];
+        path_Q = [path_theta_1; path_theta_2; path_theta_3; path_q_1;path_q_2];
+        path_dQ = [path_dtheta_1; path_dtheta_2; path_dtheta_3; path_dq_1;path_dq_2];
+        path_ddQ = [path_ddtheta_1;path_ddtheta_2;path_ddtheta_3;path_ddq_1;path_ddq_2];
     
         % Timing law computation: 
         % Tune the T in oder to have the torque boundaries respected and then:
         %               t = s*T ....    traj = sub(path,s,t/T)
-        tau_m = torque_motor([path_dq_1,path_dq_2],[path_ddq_1,path_ddq_2],ni,I_m,M,B_m);
-        
-        time_scaling = timing_law(q,s,path_q,tau_m,tau_max);
-    
-        if time_scaling>1
-            T = T*time_scaling;
-        end
     
         s_t = t/T;
         
         
-        traj_q = subs(path_q,s,s_t);
-        traj_dq = subs(path_dq,s,s_t);
-        traj_ddq = subs(path_ddq,s,s_t);
+        traj_Q = subs(path_Q,s,s_t);
+        traj_dQ = subs(path_dQ,s,s_t);
+        traj_ddQ = subs(path_ddQ,s,s_t);
     %     tau_m_sub = subs(tau_m,s,s_t);
    
     
         % Discretization
         discr_interval = 1/sampling_rate;
         timesteps = (0:discr_interval:T)'; 
-        [qs,dqs,ddqs, points] = get_trajectory_points(traj_q,traj_dq,traj_ddq, ...
+        [qs,dqs,ddqs, points] = get_trajectory_points(traj_Q,traj_dQ,traj_ddQ, ...
                                                       t, timesteps, q, position_EE);
         
         % Plots
         
-    
         % Concatenation
         q_i = q_f;
         q_ss = [q_ss;qs];
         dq_ss = [dq_ss;dqs];
-        ddq_ss = [ddq_ss;dqs];
+        ddq_ss = [ddq_ss;ddqs];
         pointss = [pointss; points];
         tot_time = tot_time +T;
     

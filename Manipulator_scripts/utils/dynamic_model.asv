@@ -18,9 +18,9 @@ vc1 = diff(pc1,q(1))*dq(1);         % CoM linear velocity
 Tl1 = (1/2)*m(1)*vc1'*vc1;          % linear kinetic energy
 
 om1 = [0 0 dq(1)]';         % angualr velocity
-Ta1 = (1/2)*om1'*diag([I1(1) I1(2) I1(3)])*om1;     %angular kinetic enetrgy
+Ta1 = (1/2)*om1'*diag([I1(1) I1(2) I1(3)])*om1;     %angular kinetic en
 
-T1= simplify(Tl1+Ta1);      %total kinetic energy
+T1= simplify(Tl1+Ta1);
 
 % link2
 pc2 = [l(1)*cos(q(1))+d(2)*cos(q(1)+q(2)) l(1)*sin(q(1))+d(2)*sin(q(1)+q(2)) 0]';

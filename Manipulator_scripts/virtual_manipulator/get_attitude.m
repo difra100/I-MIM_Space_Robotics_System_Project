@@ -10,7 +10,7 @@ function [trans] = get_j2000_coords(time_instant)
     
     i = time_instant;
 
-    r_s=[x_sc(i); y_sc(i); z_sc(i)]
+    r_s=[x_sc(i); y_sc(i); z_sc(i)];
     v_s=[v_x_sc(i); v_y_sc(i); v_z_sc(i)];
     
     z_LVLH=-r_s/norm(r_s);
