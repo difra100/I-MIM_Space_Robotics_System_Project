@@ -1,0 +1,38 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,italian]{babel}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{bm}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{derivative}
+\usepackage{color}
+
+\begin{document}
+\section{Lagrangian}
+The dynamical model is computed via the Langrangian method; so the kinematic energy is computed for each link as follows:
+$$T_i = \frac{1}{2}\,m_i\,v_{C,i}^T\,v_{C,i} + \frac{1}{2}\,^{i}\omega_i^{T}\,I_i\,^{C_i}I\,^{i}\omega_{i}$$
+then, under the hypotesis of null potential energy in space ($u=0$), the torques are obtained through the kinematic energy:
+$$\dfrac{d}{dt}\dfrac{\partial{T(\Theta,\dot{\Theta})}}{\partial{\dot{\Theta}}}-\dfrac{\partial{k(\dot{\Theta},\Theta)}}{\partial{\Theta}}=\tau$$
+being: 
+$\Theta = \begin{bmatrix} \theta_1;\theta_2\end{bmatrix}^{T}$.\\
+
+To retrieve the Mass matrix, $M$, it is possible to extract the individual terms by deriving the total kinematic energy two times with respect to $\dot{\Theta}$, remembering that these are the coefficients multiplying the velocities of the joints.\\
+
+The Velocity matrix, $V$, is retrieved through the use of the Christoffel Matrices, $C_i$. Thus, being $m_{i,j}$ the Mass matrix' coefficients and $c_{ij}$ the Christoffel symbols referred to the $k$ joint, with:
+$$c_{ji}^k=c_{ij}^k=\frac{1}{2}\,\left(\dfrac{\partial{m_{kj}}}{\partial{q_i}}+\dfrac{\partial{m_{ki}}}{\partial{q_j}}-\dfrac{\partial{m_{ij}}}{\partial{q_k}}\right)$$
+and finally:
+$$V_k = \dot{\Theta}^{T}\,C_k\,\dot{\Theta}$$.
+
+From this formulation it is also possible to split the Velocity matrix to take in account the Coriolis and centrifugal coefficients with the $B(\Theta)$ and $C(\Theta)$ matrices respectively; in this way the Configuration-Space equation cam be written as:
+$$M(\Theta)\,\ddot{\Theta}+B(\Theta)\,[\dot{\Theta}\dot{\Theta}]+C(\Theta)\,[\dot{\Theta}]^2=\tau$$
+\\
+\textcolor{red}{CAPIRE MEGLIO COME INSERIRE I TERMINI DI FRIZIONE}
+
+
+
+
+\end{document}

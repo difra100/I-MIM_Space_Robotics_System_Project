@@ -1,0 +1,44 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,italian]{babel}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{bm}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{derivative}
+\usepackage{color}
+
+\begin{document}
+\section{Jacobian computation}\\
+Knowing the position of the end effector as a function of the joint variables through the forward kinematics, $p_E(q)$, it is possible to express the linear and angular components of the end effector's velocity by means of the geometric Jacobian. In the case of a 2-Link manipulator, the Jacobian is a $6\times{2}$ matrix, composed by the linear and angular Jacobian, respectively $J_L$ and $J_A$, such that 
+$J = \begin{bmatrix}
+J_L\\
+J_A\\
+\end{bmatrix}$, and:
+
+$$ \left \{
+\begin{array}{lr}
+  \dot{p}_E = J_L(q)\,\dot{q}  \\
+  \omega_E = J_A(q)\,\dot{q}
+\end{array}
+$$
+\\
+By doing so, it is possible to express a direct relation between the velocities of the end effector and the joint velocities based only on geometric quantities. Dealing with two rotative joints, each of them gives the following Jacobian:
+$$ \left \{
+\begin{array}{lr}
+     %J_L(q) =  z_{i-1}\times{p_{i-1,E}} = \pdv{p_{0,E}(q)}{q_i} \\
+     J_{L_i}(q) =  z_{i-1}\times{p_{i-1,E}} = \dfrac{\partial{p_{0,E}(q)}}{\partial{q_i}} \\
+     J_{A_i}(q) = z_{i-1}
+      
+\end{array}
+$$
+where $z_{i-1}$ and $p_{i-1,E}$ are both referred to the base frame of the manipulator.\\
+
+\textcolor{red}{Informazioni prese da dispense Adriano e libro "}
+
+
+
+\end{document}
