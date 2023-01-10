@@ -32,10 +32,10 @@ for i=1:N-2
     T = T*A{i};
 %     T = simplify(T)
 end
-T_0N_2 = T      % penultimo joint position(base of the manipulator real)
-T_0N_1 = T*A{N-1}; % last joint position(J1)
+T_0N_2 = T;      % penultimo joint position(base of the manipulator real)
+T_0N_1 = T_0N_2*A{N-1}; % last joint position(J1)
 
-T_0N = T*A{N};    % final Transformation matrix (roto-translation)
+T_0N = T_0N_1*A{N};    % final Transformation matrix (roto-translation)
 R_0N = T_0N(1:3,1:3);   % finalt Rotation matrix
 p = T_0N(1:3,4);       % final cartesian Position
 end
