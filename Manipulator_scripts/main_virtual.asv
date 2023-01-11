@@ -85,9 +85,9 @@ tot_time = 0;
 
 disp(' Mars pointing trajectory ')
 [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit_VM( ...
-    Q_augm, q_i, q_ss, dq_ss, ddq_ss, pointss, tot_time, ...
+    q_i, q_ss, dq_ss, ddq_ss, pointss, tot_time, ...
     mars_target, M, ni, I_m, B_m, tau_max, p_VM, ...
-    theta_bounds, L0,[L1,L2], sampling_rate);
+    theta_bounds, L0,[L1,L2], sampling);
 
 q_ss = q_ss(1:end-1, :);
 dq_ss = dq_ss(1:end-1, :);
@@ -95,33 +95,14 @@ ddq_ss = ddq_ss(1:end-1, :);
 
 disp(' Earth pointing trajectory ')
 [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit_VM( ...
-    Q_augm, q_i, q_ss, dq_ss, ddq_ss, pointss, tot_time, ...
+    q_i, q_ss, dq_ss, ddq_ss, pointss, tot_time, ...
     earth_target, M, ni, I_m, B_m, tau_max, p_VM, ...
-    theta_bounds, L0,[L1,L2], sampling_rate);
+    theta_bounds, L0,[L1,L2]);
 
 
 
-timesteps = (1:size(q_ss));
 
-if (verbosity == 2 || verbosity == 3) 
-    figure()
-    plot(timesteps,q_ss(:,1),'k',timesteps,q_ss(:,2),'c', ...
-         timesteps,q_ss(:,3), 'm', timesteps,q_ss(:,4),'r', ...
-         timesteps,q_ss(:,5), 'b')
-    title('Trajectory (Q)')
 
-    figure()
-    plot(timesteps,dq_ss(:,1),'k',timesteps,dq_ss(:,2),'c', ...
-         timesteps,dq_ss(:,3), 'm', timesteps,dq_ss(:,4),'r', ...
-         timesteps,dq_ss(:,5), 'b')
-    title('Trajectory (dQ) Velocity')
-
-    figure()
-    plot(timesteps,ddq_ss(:,1),'k',timesteps,ddq_ss(:,2),'c', ...
-         timesteps,ddq_ss(:,3), 'm', timesteps,ddq_ss(:,4),'r', ...
-         timesteps,ddq_ss(:,5), 'b')
-    title('Trajectory (ddQ) Accelerations')
-end
 
 
 

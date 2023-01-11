@@ -119,12 +119,12 @@ end
 
 
 disp(' Mars pointing trajectory ')
-[q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit(q_i, q_ss, dq_ss, ddq_ss, pointss, tot_time, mars_target, M, V, B, C, p_EE, L_s);
+[q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit(q, t, q_i, q_ss, dq_ss, ddq_ss, pointss, tot_time, mars_target, M, p_EE, L_s, ni, I_m, B_m, tau_max, theta_bounds, l, sampling_rate);
 
 
 
 disp(' Earth pointing trajectory ')
-[q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit(q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time, earth_target, M, V, B, C, p_EE, L_s);
+[q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit(q, t, q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time, earth_target, M, p_EE, L_s, ni, I_m, B_m, tau_max, theta_bounds, l, sampling_rate);
 
 % if (verbosity == 2 || verbosity == 3)
 %     plot_robot_traj(robot, q_ss, pointss, cell2mat(mars_target(size(mars_target,2))),q,p_EE,p_tip);
@@ -134,8 +134,7 @@ fprintf('To get to the Control part press inv \n')
 pause()
 discr_interval = 1/sampling_rate;
 timesteps = (0:discr_interval:tot_time)'
-size(timesteps)
-size(q_ss)
+
 % if (verbosity == 2 || verbosity == 3)
 %         figure
 %         plot(timesteps,q_ss(:,1),'r',timesteps,q_ss(:,2),'b')
@@ -166,7 +165,7 @@ space_craft_velocity_base = T_lvlh_b*[spacecraft_velocity;1];  % Spacecraft velo
 
 atm_drag_fixed = (1/2) * drag_coeff * mars_density * Area_Antenna;        % without velocity = 1/2 * C_p * density * A
 
-tot_time
+
 
 
 timesteps = (0:discr_interval:tot_time)'; 
@@ -187,8 +186,8 @@ q_d = q_ss;
 dq_d = dq_ss;
 ddq_d = ddq_ss;
 trajectory = pointss;
-size(q_d)
-size(count_steps)
+
+
 options = odeset('RelTol', 1.0E-4, 'AbsTol', 1.0E-4);
 
 for i = 1:count_steps-1

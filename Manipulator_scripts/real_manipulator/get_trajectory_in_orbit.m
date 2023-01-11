@@ -1,4 +1,4 @@
-function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit(q_i, q_ss, dq_ss, ddq_ss, pointss, tot_time, target_poss, M, V, B, C, position_EE, L_s)
+function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit(q, t, q_i, q_ss, dq_ss, ddq_ss, pointss, tot_time, target_poss, M, position_EE, L_s, ni, I_m, B_m, tau_max, theta_bounds, l, sampling_rate)
     % This function computes the optimal joint configuration in order to
     % point at a certain planet.
     % INPUTs : q_i : Starting configuration, q_ss: time series of the
@@ -13,8 +13,6 @@ function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit
 
 
 
-    init;
-    syms T real
     syms s real  % --> s = t/T in [0,1] (timing law)
     for i = 1:size(target_poss,2)
         T = 1;     % TO tune when doing bang-cost-bang once in dynamics
@@ -34,7 +32,7 @@ function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit
         tau_m = torque_motor([path_dq_1,path_dq_2],[path_ddq_1,path_ddq_2],ni,I_m,M,B_m);
         
         time_scaling = timing_law(q,s,path_q,tau_m,tau_max);
-    
+        
         if time_scaling>1
             T = T*time_scaling;
         end

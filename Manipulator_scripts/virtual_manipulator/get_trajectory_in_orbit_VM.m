@@ -1,7 +1,7 @@
 function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit_VM( ...
-    q_i, q_ss, dq_ss, ddq_ss, pointss, tot_time, ...
+    Q_augm, q_i, q_ss, dq_ss, ddq_ss, pointss, tot_time, ...
     target_poss, M, ni, I_m, B_m, tau_max, ...
-    position_EE, theta_bounds, l_0,l)
+    position_EE, theta_bounds, l_0,l, sampling_rate)
     % This function computes the optimal joint configuration in order to
     % point at a certain planet.
     % INPUTs : q_i : Starting configuration, q_ss: time series of the
@@ -14,7 +14,7 @@ function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit
     % OUTPUTs : q_f : Final pointing configuration, the other are the same
         % as before, but now they are computed after the new maneuvre.
 
-    syms s real  % --> s = t/T in [0,1] (timing law)
+    syms s t real  % --> s = t/T in [0,1] (timing law)
     for i = 1:size(target_poss,2)
         T = 1;     
     
@@ -47,7 +47,7 @@ function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit
         discr_interval = 1/sampling_rate;
         timesteps = (0:discr_interval:T)'; 
         [qs,dqs,ddqs, points] = get_trajectory_points(traj_Q,traj_dQ,traj_ddQ, ...
-                                                      t, timesteps, q, position_EE);
+                                                      t, timesteps, Q_augm, position_EE);
         
         % Plots
         

@@ -4,9 +4,9 @@ function [qs,dqs,ddqs, points] = get_trajectory_points(traj_q,traj_dq, ...
 count = length(time_steps); % discrete time intervals
 
  % preallocate memory
-qs = zeros(count, 2); 
-dqs = zeros(count, 2); 
-ddqs = zeros(count, 2); 
+qs = zeros(count, size(q,1)); 
+dqs = zeros(count, size(q,1)); 
+ddqs = zeros(count, size(q,1)); 
 points = zeros(count, 3);
 
 
