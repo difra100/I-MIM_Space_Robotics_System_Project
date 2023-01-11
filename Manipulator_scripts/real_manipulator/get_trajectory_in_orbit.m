@@ -1,4 +1,6 @@
-function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit(q, t, q_i, q_ss, dq_ss, ddq_ss, pointss, tot_time, target_poss, M, position_EE, L_s, ni, I_m, B_m, tau_max, theta_bounds, l, sampling_rate)
+function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit(q,dq, t, ...
+    q_i, q_ss, dq_ss, ddq_ss, pointss, tot_time, target_poss, M, position_EE, L_s, ...
+    ni, I_m, B_m, tau_max,tau_c_sym, theta_bounds, l, sampling_rate)
     % This function computes the optimal joint configuration in order to
     % point at a certain planet.
     % INPUTs : q_i : Starting configuration, q_ss: time series of the
@@ -16,9 +18,9 @@ function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit
     syms s real  % --> s = t/T in [0,1] (timing law)
     for i = 1:size(target_poss,2)
         T = 1;     % TO tune when doing bang-cost-bang once in dynamics
-    
-        q_f = get_target_conf(cell2mat(target_poss(i)),theta_bounds, q_i, l, L_s);
-        
+
+
+        q_f = get_target_conf(target_poss(:,i),theta_bounds, q_i, l, L_s);
         % Path planning
         [path_q_1, path_dq_1,path_ddq_1] = path_planning(q_i(1), q_f(1), 0, 0, 0, 0,s);
         [path_q_2, path_dq_2,path_ddq_2] = path_planning(q_i(2), q_f(2), 0, 0, 0, 0,s);
@@ -29,7 +31,9 @@ function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit
         % Timing law computation: 
         % Tune the T in oder to have the torque boundaries respected and then:
         %               t = s*T ....    traj = sub(path,s,t/T)
-        tau_m = torque_motor([path_dq_1,path_dq_2],[path_ddq_1,path_ddq_2],ni,I_m,M,B_m);
+        tau_c = subs(tau_c_sym,dq,path_dq);
+
+        tau_m = torque_motor([path_dq_1,path_dq_2],[path_ddq_1,path_ddq_2],ni,I_m,M,B_m,tau_c);
         
         time_scaling = timing_law(q,s,path_q,tau_m,tau_max);
         
