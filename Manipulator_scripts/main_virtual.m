@@ -56,7 +56,7 @@ DHtable_VM = DH_generator_VM(L0,[L1,L2], Q_augm);
 
 %% IMPORTANT TRANSFORMATIONS
 
-q_i = [0,0,0,0,0]';
+q_i = [0,0,0,pi/4,pi/3]';
 
 % 
 % [T_EE_real,~,~,~,~] = forward_kinematics(DHtable,T_lvlh_b);
@@ -93,9 +93,10 @@ q_ss = q_ss(1:end-1, :);
 dq_ss = dq_ss(1:end-1, :);
 ddq_ss = ddq_ss(1:end-1, :);
 
+
 disp(' Earth pointing trajectory ')
 [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit_VM( ...
-    Q_augm, q_i, q_ss, dq_ss, ddq_ss, pointss, tot_time, ...
+    Q_augm, q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time, ...
     earth_target, M, ni, I_m, B_m, tau_max, p_VM, ...
     theta_bounds, L0,[L1,L2], sampling_rate);
 
