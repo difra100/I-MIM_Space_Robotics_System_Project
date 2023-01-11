@@ -1,10 +1,10 @@
 
-function robot = create_robot(l,q_i)
+function robot = create_robot(l,q_i, L_s)
 
 robot = rigidBodyTree('DataFormat','col'); %The 'base' is actually the inertia frame
 
 
-[DHparam,T_o_b] = DH_generator(l,q_i);
+[DHparam,T_o_b] = DH_generator(l,q_i, L_s);
 col1 = DHparam(:,1);
 col2 = DHparam(:,2);
 col3 = DHparam(:,3);

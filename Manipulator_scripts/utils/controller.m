@@ -1,6 +1,6 @@
 function [derror] = controller(t, error, q_d, dq_d, ddq_d, q,dq, timesteps, k_p, k_d, ...
                             M_mod, V_mod,tau_c,J,atm_drag, ...
-                            M_true,V_true,atm_drag_true)
+                            M_true,V_true,atm_drag_true, i)
 
 
 e = error(1:2);
@@ -8,9 +8,9 @@ de = error(3:4);
 
 %interpolation
 
-qi_d = interp1(timesteps, q_d, t)';
-dqi_d = interp1(timesteps, dq_d, t)';
-ddqi_d = interp1(timesteps, ddq_d, t)';
+qi_d = q_d(i,:)';%interp1(timesteps, q_d, t)';
+dqi_d = dq_d(i, :)';%interp1(timesteps, dq_d, t)';
+ddqi_d = ddq_d(i, :)';%interp1(timesteps, ddq_d, t)';
 
 q_real = qi_d - e;
 dq_real = dqi_d - de;

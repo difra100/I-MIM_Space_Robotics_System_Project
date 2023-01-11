@@ -16,10 +16,10 @@ fprintf('Verbosity level: %i\n\n',verbosity);
 
 % DH table [alpha_i d_i a_i theta_i] (original method)
 
-[DHTABLE,T_lvlh_b]= DH_generator(l,q);
+[DHTABLE,T_lvlh_b]= DH_generator(l,q, L_s);
 
 q_i =[0;0];
-robot = create_robot(l,q_i);
+robot = create_robot(l,q_i, L_s);
 
 
 %% KINEMATICS
@@ -101,9 +101,9 @@ earth_target = get_targets(orbit_ts, 0); % Extracting the first #orbit_ts points
 
 
 % To cumulate points
-q_ss = [];
-dq_ss = [];
-ddq_ss = [];
+q_ss = [q_i'];
+dq_ss = [0;0]';
+ddq_ss = [0;0]';
 pointss = [];
 tot_time = 0;
 
@@ -119,14 +119,12 @@ end
 
 
 disp(' Mars pointing trajectory ')
-[q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit(q_i, q_ss, dq_ss, ddq_ss, pointss, tot_time, mars_target, M, V, B, C, p_EE);
+[q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit(q_i, q_ss, dq_ss, ddq_ss, pointss, tot_time, mars_target, M, V, B, C, p_EE, L_s);
 
-q_ss = q_ss(1:end-1, :)
-dq_ss = dq_ss(1:end-1, :)
-ddq_ss = ddq_ss(1:end-1, :)
+
 
 disp(' Earth pointing trajectory ')
-[q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit(q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time, earth_target, M, V, B, C, p_EE);
+[q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit(q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time, earth_target, M, V, B, C, p_EE, L_s);
 
 % if (verbosity == 2 || verbosity == 3)
 %     plot_robot_traj(robot, q_ss, pointss, cell2mat(mars_target(size(mars_target,2))),q,p_EE,p_tip);
@@ -135,8 +133,9 @@ disp(' Earth pointing trajectory ')
 fprintf('To get to the Control part press inv \n')
 pause()
 discr_interval = 1/sampling_rate;
-timesteps = (0:discr_interval:tot_time)'; 
-
+timesteps = (0:discr_interval:tot_time)'
+size(timesteps)
+size(q_ss)
 % if (verbosity == 2 || verbosity == 3)
 %         figure
 %         plot(timesteps,q_ss(:,1),'r',timesteps,q_ss(:,2),'b')
@@ -167,6 +166,8 @@ space_craft_velocity_base = T_lvlh_b*[spacecraft_velocity;1];  % Spacecraft velo
 
 atm_drag_fixed = (1/2) * drag_coeff * mars_density * Area_Antenna;        % without velocity = 1/2 * C_p * density * A
 
+tot_time
+
 
 timesteps = (0:discr_interval:tot_time)'; 
 count_steps = length(timesteps);
@@ -186,7 +187,8 @@ q_d = q_ss;
 dq_d = dq_ss;
 ddq_d = ddq_ss;
 trajectory = pointss;
-
+size(q_d)
+size(count_steps)
 options = odeset('RelTol', 1.0E-4, 'AbsTol', 1.0E-4);
 
 for i = 1:count_steps-1
@@ -218,9 +220,11 @@ for i = 1:count_steps-1
     [t_int,error_int] = ode113(@(time,error)controller(time, error, q_d, dq_d, ddq_d, ...
                             q,dq, timesteps, k_p, k_d, ...
                             M, V,tau_c,J_L,atm_drag, ...
-                            M_true,V_true,atm_drag_true), ...
+                            M_true,V_true,atm_drag_true, i), ...
                             tspan, error(i,:)', options);
     
+
+
     row=length(error_int);
 
     q_0(i+1,:)=q_d(i+1,:)-error_int(row,1:2);

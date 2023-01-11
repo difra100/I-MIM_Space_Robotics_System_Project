@@ -1,4 +1,4 @@
-function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit(q_i, q_ss, dq_ss, ddq_ss, pointss, tot_time, target_poss, M, V, B, C, position_EE)
+function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit(q_i, q_ss, dq_ss, ddq_ss, pointss, tot_time, target_poss, M, V, B, C, position_EE, L_s)
     % This function computes the optimal joint configuration in order to
     % point at a certain planet.
     % INPUTs : q_i : Starting configuration, q_ss: time series of the
@@ -19,7 +19,7 @@ function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit
     for i = 1:size(target_poss,2)
         T = 1;     % TO tune when doing bang-cost-bang once in dynamics
     
-        q_f = get_target_conf(cell2mat(target_poss(i)),theta_bounds, q_i, l);
+        q_f = get_target_conf(cell2mat(target_poss(i)),theta_bounds, q_i, l, L_s);
         
         % Path planning
         [path_q_1, path_dq_1,path_ddq_1] = path_planning(q_i(1), q_f(1), 0, 0, 0, 0,s);
@@ -59,9 +59,9 @@ function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit
     
         % Concatenation
         q_i = q_f;
-        q_ss = [q_ss;qs];
-        dq_ss = [dq_ss;dqs];
-        ddq_ss = [ddq_ss;dqs];
+        q_ss = [q_ss;qs(2:end, :)];
+        dq_ss = [dq_ss;dqs(2:end, :)];
+        ddq_ss = [ddq_ss;dqs(2:end, :)];
         pointss = [pointss; points];
         tot_time = tot_time +T;
     
