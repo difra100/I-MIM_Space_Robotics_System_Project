@@ -6,7 +6,7 @@ function plot_robot_traj_VM(robot, q_d, points,target_pos,Q,f,f_tip)
 figure
 show(robot,q_d(1,:)');
 
-axis([-1,1,-1,1,-1,1]*30);
+axis([-1,1,-1,1,-1,1]);
 
 
 %------> Target in cartesia space = SPHERE

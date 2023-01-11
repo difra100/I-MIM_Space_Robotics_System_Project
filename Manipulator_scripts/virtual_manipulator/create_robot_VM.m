@@ -63,7 +63,7 @@ addBody(robot, body5, 'link4');
 % Defining the EE
 tool = rigidBody('tool');
 jointEE = rigidBodyJoint('fix1','fixed');
-setFixedTransform(jointEE, trvec2tform([1,0,0]));
+setFixedTransform(jointEE, trvec2tform([0.01,0,0]));
 tool.Joint = jointEE;
 addBody(robot, tool, 'link5');
 

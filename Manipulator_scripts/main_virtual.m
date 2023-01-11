@@ -58,7 +58,8 @@ p_tip = T_tip(1:3,4);
 %% IMPORTANT TRANSFORMATIONS
 
 % q_i = [0,0,0,pi/4,pi/3]';
- q_i = [0,0,0,0,0]';
+q_i = [0,0,0,0,0]';
+robot = create_robot_VM(L0,[L1,L2],q_i);
 % 
 % [T_EE_real,~,~,~,~] = forward_kinematics(DHtable,T_lvlh_b);
 % 
