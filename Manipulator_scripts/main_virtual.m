@@ -50,14 +50,15 @@ L2 = norm(r_(3)+l_(3));
 % of the virtual manipulator!
 DHtable_VM = DH_generator_VM(L0,[L1,L2], Q_augm);
 
-[T_VM, R_VM, p_VM,~,~] = forward_kinematics_VM(DHtable_VM);
-
+[T_EE, R_EE, p_EE,~,~] = forward_kinematics_VM(DHtable_VM);
+T_tip = T_EE*trvec2tform([0.01,0,0]);
+p_tip = T_tip(1:3,4);
 
 
 %% IMPORTANT TRANSFORMATIONS
 
-q_i = [0,0,0,pi/4,pi/3]';
-
+% q_i = [0,0,0,pi/4,pi/3]';
+ q_i = [0,0,0,0,0]';
 % 
 % [T_EE_real,~,~,~,~] = forward_kinematics(DHtable,T_lvlh_b);
 % 
@@ -69,9 +70,19 @@ q_i = [0,0,0,pi/4,pi/3]';
 % fprintf(' Virtual E-E position: %f \n ',vpa(norm(subs(p_VM, Q_augm, q_i)), 6))
 % 
 % fprintf(' Real E-E position: %f \n',vpa(norm(subs(p_EE_j2000, Q_augm, q_i)), 6))
+vg_0 = double(subs(vg,Q_augm,q_i));
+mars_target_cell = get_targets(orbit_ts, 1);
+earth_target_cell = get_targets(orbit_ts, 0);
+mars_target = [];
+earth_target = [];
 
-mars_target = get_targets(orbit_ts, 1);
-earth_target = get_targets(orbit_ts, 0);
+
+for i=1:3
+    mars_target_i = T_lvlh_j2000*trvec2tform(vg_0')*[cell2mat(mars_target_cell(i));1];
+    mars_target(:,end+1) = mars_target_i(1:3);
+    earth_target_i = T_lvlh_j2000*trvec2tform(vg_0')*[cell2mat(earth_target_cell(i));1];
+    earth_target(:,end+1) = earth_target_i(1:3);
+end
 
 % To cumulate points
 q_ss = [];
@@ -86,7 +97,7 @@ tot_time = 0;
 disp(' Mars pointing trajectory ')
 [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit_VM( ...
     Q_augm, q_i, q_ss, dq_ss, ddq_ss, pointss, tot_time, ...
-    mars_target, M, ni, I_m, B_m, tau_max, p_VM, ...
+    mars_target, M, ni, I_m, B_m, tau_max, p_EE, ...
     theta_bounds, L0,[L1,L2], sampling_rate);
 
 q_ss = q_ss(1:end-1, :);
@@ -97,10 +108,12 @@ ddq_ss = ddq_ss(1:end-1, :);
 disp(' Earth pointing trajectory ')
 [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit_VM( ...
     Q_augm, q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time, ...
-    earth_target, M, ni, I_m, B_m, tau_max, p_VM, ...
+    earth_target, M, ni, I_m, B_m, tau_max, p_EE, ...
     theta_bounds, L0,[L1,L2], sampling_rate);
 
-
+if (verbosity == 2 || verbosity == 3)
+    plot_robot_traj_VM(robot, q_ss, pointss, mars_target(:,end),Q_augm,p_EE,p_tip);
+end
 
 timesteps = (1:size(q_ss));
 
@@ -124,6 +137,10 @@ if (verbosity == 2 || verbosity == 3)
     title('Trajectory (ddQ) Accelerations')
 end
 
+
+
+
+%% PLOT TRAJECTORY
 
 
 

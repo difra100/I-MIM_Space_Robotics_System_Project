@@ -18,7 +18,7 @@ function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit
     for i = 1:size(target_poss,2)
         T = 1;     
     
-        q_f = get_target_conf_VM(cell2mat(target_poss(i)),theta_bounds, q_i, l_0,l);
+        q_f = get_target_conf_VM(target_poss(:,i),theta_bounds, q_i, l_0,l);
         
         % Path planning
         [path_theta_1, path_dtheta_1,path_ddtheta_1] = path_planning(q_i(1), q_f(1), 0, 0, 0, 0,s); % theta1

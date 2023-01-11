@@ -101,7 +101,7 @@ earth_target = get_targets(orbit_ts, 0); % Extracting the first #orbit_ts points
 
 
 % To cumulate points
-q_ss = [q_i'];
+q_ss = q_i';
 dq_ss = [0;0]';
 ddq_ss = [0;0]';
 pointss = [];
