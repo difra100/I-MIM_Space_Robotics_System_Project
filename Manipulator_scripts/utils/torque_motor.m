@@ -1,4 +1,4 @@
-function tau_m = torque_motor(dq,ddq,ni,I_m,M,B_m)
+function tau_m = torque_motor(dq,ddq,ni,I_m,M,B_m,tau_c)
 
 % INPUTS:
 %       - dq = [dq1,dq2]: actual joint speed
@@ -24,7 +24,7 @@ tau_m = (I_m + temp1)*ddq_m + ni_diag*temp2;
 
 
 
-tau_f = B_m*dq_m;     %viscous friction
+tau_f = B_m*dq_m + tau_c./ni;     %viscous friction
 
 tau_m = tau_m + tau_f;
 
