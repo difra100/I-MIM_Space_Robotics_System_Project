@@ -53,8 +53,9 @@ q0.q_2 = init_guess(5);
 if q_s.q_1 <= q_bounds.high(1) && q_s.q_2 <= q_bounds.high(2) && q_s.q_1>= q_bounds.low(1) && q_s.q_2 >= q_bounds.low(2)
     disp('The solution is feasible..........')
     q_f = [q_s.theta1; q_s.theta2; q_s.theta3; q_s.q_1; q_s.q_2];
+    fprintf(' - Solution: [%f %f %f] \n', qf)
+    fprintf(' - Objective function: %f \n', fval)
     
-    fval
 else 
     disp('No good solution')
     q_f = init_guess;
