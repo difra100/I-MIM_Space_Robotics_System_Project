@@ -39,6 +39,26 @@ where $z_{i-1}$ and $p_{i-1,E}$ are both referred to the base frame of the manip
 
 \textcolor{red}{Informazioni prese da dispense Adriano e libro "}
 
+\textcolor{blue}{$J*atm_drag$ serve slide 28 jacobian: per realazionare con joint space}
+
+\section{Robot configuration}\\
+From the orbits acquired in first part we know the positions of Mars and Earth in the LVLH frame. From here, the fixed attitude of the satellite, with an off-nadir angle of 15° for the array pointing to Mars, is imposed with a rotation matrix around the y-axis multiplying the data relative to Mars.\\
+
+Now, it's possible to generate the trajectory the robot needs to follow in order to correctly point to the targets. First of all, from the position of the end effector, expressed in the \textcolor{red}{[???]} frame, as the target position [...] \textcolor{blue}{aggiungere problema ottimizzazione}
 
 
+\subsection{Path planning}
+For each configuration determined at the previous step, a fifth order polynomial is used to allow the definition of position, velocity and acceleration at the starting and ending path segments:
+$$\theta(t)=a_0\,+a_1\,t+a_2\,t^2+a_3\,t^3+a_4\,t^4+a_5\,t^5$$
+and deriving with respect to t $\dot{\theta}$ and $\ddot{\theta}$ are obtained. Then, to determine the coefficients the following boundary conditions are imposed:
+$$\dot{\theta}_i(t_0)=\dot{\theta}_i(t_f)=0 \;\;\;\;\;\; ; \;\;\;\;\;\; \ddot{\theta}_i(t_0)=\ddot{\theta}_i(t_f)=0
+$$
+$$\theta_i(t_0)=\theta_{i,0} \;\;\;\;\;\; ; \;\;\;\;\;\ \theta_i(t_f)=\theta_{i,f}$$
+By computing the Jacobian a linear system is obtained, so the desired evolution in time of the joint angles, velocity and accelerations is easily computed.\\
+
+\subsubsection{Torque control}\\
+To verify that the torque required at each step doens't exceed the boundaries imposed by the motors, a parametric control is introduced. Given $s=\dfrac{t}{T}$, with $s\in{[0,1]}$ and $T=1$ at the initial step, the previous polynomial is implemented in the code with this substitution.\\
+Then, the torque at the motor side is computed as follows:
+$$\tau_m=\left (I_m+\dfrac{I}{\eta^2}\right)\ddot{\theta}_m + \left(b_m+\dfrac{b}{\eta}^2\right)\,\dot{\theta}_m + \dfrac{\tau_c}{\eta}$$
+where: $\eta$ is the gear ratio, $b_m$ is the viscous friction coefficient, $\tau_c$ the static friction and $I$ and $I_m$ the inertia of the motor and the joints respectively. When the torque exceed the boundaries a scale factor for $T$ is computed, and by using the same discretization for $t$ a longer time for the joint to reach its position is allowed.
 \end{document}
