@@ -93,9 +93,14 @@ tau_c= [(1 + sign(dq(1)))/2 *tauC_plus + (1 - sign(dq(1)))/2 *tauC_minus;
 fprintf('To get to the Trajectories press inv \n')
 pause()
 % TRAJECTORIES
+orbit_ts = minutes*6; % Each timestep has 10 seconds of distance.
 
-mars_target_cell = get_targets(orbit_ts, 1);% Extracting the first #orbit_ts points of mars position  (ts: time samples)
-earth_target_cell = get_targets(orbit_ts, 0);% Extracting the first #orbit_ts points of earth position (ts: time samples)
+
+
+
+
+mars_target_cell = get_targets(0, orbit_ts, 1);% Extracting the first #orbit_ts points of mars position  (ts: time samples)
+earth_target_cell = get_targets(orbit_ts+1, orbit_ts, 0);% Extracting the first #orbit_ts points of earth position (ts: time samples)
 mars_target = [];
 earth_target = [];
 

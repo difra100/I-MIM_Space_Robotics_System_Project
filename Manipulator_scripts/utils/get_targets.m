@@ -1,7 +1,6 @@
-function [target_cell] = get_targets(len, type)
+function [target_cell] = get_targets(start, len, type)
 % Get the data for the earth/planet positions.
 % 
-
 
 skiprow = 0;    
 target_cell = {};
@@ -13,7 +12,7 @@ if type == 0  % This is to get the array for the earth pointing
     i = 1;
     while size(target_cell, 2) < len
         
-        point = [data.sc_2_earth_LVLH_1(i+skiprow); data.sc_2_earth_LVLH_2(i+skiprow); data.sc_2_earth_LVLH_3(i+skiprow)];
+        point = [data.sc_2_earth_LVLH_1(start+skiprow+i); data.sc_2_earth_LVLH_2(start+skiprow+i); data.sc_2_earth_LVLH_3(start+skiprow+i)];
         new_point = point;
         target_cell{i} = new_point;
         i= i + 1;
