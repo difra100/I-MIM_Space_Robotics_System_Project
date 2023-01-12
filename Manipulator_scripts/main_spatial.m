@@ -103,7 +103,7 @@ R_of_nadir = rotm2tform(elem_rot_mat('y',deg2rad(15)));
 for i=1:3
     mars_target_i = R_of_nadir*[cell2mat(mars_target_cell(i));1];
     mars_target(:,end+1) = mars_target_i(1:3);
-    earth_target_i = R_of_nadir*[cell2mat(earth_target_cell(i));1];
+    earth_target_i = [cell2mat(earth_target_cell(i));1];
     earth_target(:,end+1) = earth_target_i(1:3);
 end
 
