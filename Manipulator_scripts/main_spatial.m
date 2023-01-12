@@ -137,9 +137,9 @@ disp(' Earth pointing trajectory ')
     q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time, earth_target, M, p_EE, L_s, ...
     ni, I_m, B_m, tau_max,tau_c, theta_bounds, l, sampling_rate);
 
-% if (verbosity == 2 || verbosity == 3)
-%     plot_robot_traj(robot, q_ss, pointss, cell2mat(mars_target(size(mars_target,2))),q,p_EE,p_tip);
-% end
+if (verbosity == 2 || verbosity == 3)
+    plot_robot_traj(robot, q_ss, pointss, earth_target(:,end),q,p_EE,p_tip);
+end
 
 fprintf('To get to the Control part press inv \n')
 pause()
