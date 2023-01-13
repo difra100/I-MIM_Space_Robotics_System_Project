@@ -247,7 +247,7 @@ end
 
 
 if (verbosity == 2 || verbosity == 3) 
-    figure
+    figure()
     plot(timesteps,q_0(:,1),'r',timesteps,q_d(:,1),'r--', ...
          timesteps,q_0(:,2),'b',timesteps,q_d(:,2),'b--')
     title('Trajectory traking - Q')
@@ -269,9 +269,9 @@ end
 
 fprintf('To plot the Robot Motion press inv \n')
 pause()
-if (verbosity == 2 || verbosity == 3)
-    plot_robot_traj(robot, q_0, trajectory, earth_target(:,end),q,p_EE,p_tip)
-end
+% if (verbosity == 2 || verbosity == 3)
+%     plot_robot_traj(robot, q_0, trajectory, earth_target(:,end),q,p_EE,p_tip)
+% end
 
 
 

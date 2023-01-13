@@ -114,9 +114,9 @@ disp(' Earth pointing trajectory ')
     earth_target, M, ni, I_m, B_m, tau_max, p_EE, ...
     theta_bounds, L0,[L1,L2], sampling_rate);
 
-if (verbosity == 2 || verbosity == 3)
-    plot_robot_traj_VM(robot, q_ss, pointss, mars_target(:,end),Q_augm,p_EE,p_tip);
-end
+% if (verbosity == 2 || verbosity == 3)
+%     plot_robot_traj_VM(robot, q_ss, pointss, mars_target(:,end),Q_augm,p_EE,p_tip);
+% end
 
 timesteps = (1:size(q_ss));
 
