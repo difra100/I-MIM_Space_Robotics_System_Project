@@ -13,6 +13,7 @@
 \usepackage{color}
 \usepackage{optidef}
 \usepackage{tensor}
+\usepackage{multirow}
 \begin{document}
 
 \section{Robot Control}\\
@@ -30,7 +31,23 @@ To relate this external disturbance to the joint space is sufficient to multiply
 $$\tau_a=J_L^T\,a_D$$
 
 \subsection{Mismodelling}
-\textcolor{red}{Definire modello reale con mismodelling dell'ordine dell'incertezza sulle misure disponibili}
+With the aim of dealing with a closer to reality model, a mismodeling is introduced. So, the "true" variables are created by the sum of the nominal value and the term given by the multiplication of an arbitrary tolerance and the AWGN. For a general variable X we have:
+$$X_{true} = X_{nom} + AWGN*X_{toll} $$
+The table \textcolor{red}{Inserire rif incrociato alla tabella qui sotto} show the tolerances adopted for each given nominal variable; which will be three order smaller than the nominal value \\
+
+\begin{tabular}{ |p{3cm}||p{3cm}||p{3cm}|  }
+ \hline
+ \multicolumn{3}{|c|}{Tolerances List} \\
+ \hline
+ Variables Name& Tolerance &Measurement unit\\
+ \hline
+ Link Length & $10^{-3}$ & m\\
+ Link Radius & $10^{-4}$ & m\\
+ Link Thickness & $10^{-6}$ & m\\
+ \hline
+\end{tabular}\\
+\\
+The result is that all the computed variables which uses these three will be affected by mismodelling, this is the case of the matrices M, V, B and C; which mismodeled version will be called "true" in the code and denoted with an hat in this paper.
 
 \subsection{Control scheme}
 The controller is modelled as a feedforward nonlinear control with external perturbations.\\
@@ -39,6 +56,7 @@ The controller is modelled as a feedforward nonlinear control with external pert
 \caption{Fig.\textcolor{red}{mettere numero giusto}: Control scheme used for the robot model.}\\[8pt]
 The configurations given in input is "disturbed" by artificially adding an AWGN, so to have the error, $e$, computed as the desired configuration minus the actual one:
 $$e=\theta_d-\theta$$
+$$\dot{e}=\dot{\theta_d}-\dot{\theta}$$
 The commanded acceleration, $\tau'$ can be computed as:
 $$\tau'=\ddot{\theta}_d+k_v\,\dot{e}+k_p\,e$$
 with $k_v=400$ and $k_d=2\,\sqrt{k_v}$ being the control gains. Then, the effective required torque is easily obtained:
