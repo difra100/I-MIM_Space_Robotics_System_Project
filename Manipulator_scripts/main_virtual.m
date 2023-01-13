@@ -18,7 +18,7 @@ fprintf('Verbosity level: %i\n\n',verbosity);
 % Get the original DHtable and modifying the mapping from LVLH to the base 
 % frame in order to include the new Dofs from the spaceCraft
 
-
+orbit_ts = minutes*6;
 DHtable = DH_generator_VM(L_s/2,l, Q_augm);
 
 time_instant = 1; % First instant to compute the virtual ground position 
@@ -72,13 +72,15 @@ robot = create_robot_VM(L0,[L1,L2],q_i);
 % 
 % fprintf(' Real E-E position: %f \n',vpa(norm(subs(p_EE_j2000, Q_augm, q_i)), 6))
 vg_0 = double(subs(vg,Q_augm,q_i));
-mars_target_cell = get_targets(orbit_ts, 1);
-earth_target_cell = get_targets(orbit_ts, 0);
+
+
+mars_target_cell = get_targets(1, orbit_ts, 1);
+earth_target_cell = get_targets(orbit_ts+1, orbit_ts, 0);
 mars_target = [];
 earth_target = [];
 
 
-for i=1:3
+for i=1:orbit_ts
     mars_target_i = T_lvlh_j2000*trvec2tform(vg_0')*[cell2mat(mars_target_cell(i));1];
     mars_target(:,end+1) = mars_target_i(1:3);
     earth_target_i = T_lvlh_j2000*trvec2tform(vg_0')*[cell2mat(earth_target_cell(i));1];
@@ -124,18 +126,19 @@ if (verbosity == 2 || verbosity == 3)
          timesteps,q_ss(:,3), 'm', timesteps,q_ss(:,4),'r', ...
          timesteps,q_ss(:,5), 'b')
     title('Trajectory (Q)')
-
+    legend('Attitude 1','Attitude 2', 'Attitude 3', 'Joint 1', 'Joint 2')
     figure()
     plot(timesteps,dq_ss(:,1),'k',timesteps,dq_ss(:,2),'c', ...
          timesteps,dq_ss(:,3), 'm', timesteps,dq_ss(:,4),'r', ...
          timesteps,dq_ss(:,5), 'b')
     title('Trajectory (dQ) Velocity')
-
+    legend('Attitude 1','Attitude 2', 'Attitude 3', 'Joint 1', 'Joint 2')
     figure()
     plot(timesteps,ddq_ss(:,1),'k',timesteps,ddq_ss(:,2),'c', ...
          timesteps,ddq_ss(:,3), 'm', timesteps,ddq_ss(:,4),'r', ...
          timesteps,ddq_ss(:,5), 'b')
     title('Trajectory (ddQ) Accelerations')
+    legend('Attitude 1','Attitude 2', 'Attitude 3', 'Joint 1', 'Joint 2')
 end
 
 

@@ -49,6 +49,19 @@ function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit
         [qs,dqs,ddqs, points] = get_trajectory_points(traj_Q,traj_dQ,traj_ddQ, ...
                                                       t, timesteps, Q_augm, position_EE);
         
+%         remaining_time = 10 - T;
+%         
+%         sampling_time = 1/sampling_rate;
+%         num_of_confs = remaining_time/sampling_time;
+% 
+%         remaining_qs = qs(end,:).*ones(num_of_confs, size(qs(end, :),2));
+%         remaining_dqs = dqs(end,:).*ones(num_of_confs, size(dqs(end, :),2));
+%         remaining_ddqs = ddqs(end,:).*ones(num_of_confs, size(ddqs(end, :),2));
+%         qs = [qs;remaining_qs];
+%         dqs = [dqs; remaining_dqs];
+%         ddqs = [ddqs; remaining_ddqs];
+
+
         % Plots
         
         % Concatenation
@@ -58,6 +71,7 @@ function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit
         ddq_ss = [ddq_ss;ddqs];
         pointss = [pointss; points];
         tot_time = tot_time +T;
+%         tot_time = tot_time + remaining_time;
     
     end
 end

@@ -140,9 +140,9 @@ fprintf('\n********* Earth pointing trajectory *************\n')
     q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time, earth_target, M, p_EE, L_s, ...
     ni, I_m, B_m, tau_max,tau_c, theta_bounds, l, sampling_rate);
 
-if (verbosity == 2 || verbosity == 3)
-    plot_robot_traj(robot, q_ss, pointss, earth_target(:,end),q,p_EE,p_tip);
-end
+% if (verbosity == 2 || verbosity == 3)
+%     plot_robot_traj(robot, q_ss, pointss, earth_target(:,end),q,p_EE,p_tip);
+% end
 
 fprintf('\n----> To get to the Control part press inv \n')
 pause()
@@ -203,7 +203,7 @@ trajectory = pointss;
 
 
 options = odeset('RelTol', 1.0E-4, 'AbsTol', 1.0E-4);
-dips('Integration steps:')
+disp('Integration steps:')
 for i = 1:count_steps-1
     fprintf(' - Step %i \n',i)
     %Build the controller part in ored to compute the effective acc command...
@@ -251,19 +251,20 @@ if (verbosity == 2 || verbosity == 3)
     plot(timesteps,q_0(:,1),'r',timesteps,q_d(:,1),'r--', ...
          timesteps,q_0(:,2),'b',timesteps,q_d(:,2),'b--')
     title('Trajectory traking - Q')
-
+    legend('Joint 1', 'Joint 1 (des)', 'Joint 2', 'Joint 2 (des)')
     figure
     plot(timesteps,dq_0(:,1),'r',timesteps,dq_d(:,1),'r--', ...
          timesteps,dq_0(:,2),'b',timesteps,dq_d(:,2),'b--')
     title('Trajectory traking - dQ')
-    
+    legend('Joint 1', 'Joint 1 (des)', 'Joint 2', 'Joint 2 (des)')
     figure
-    plot(timesteps,error(:,1),'r',timesteps,error(:,2))
+    plot(timesteps,error(:,1),'r',timesteps,error(:,2), 'b')
     title('Errors - Q')
-
+    legend('Joint 1', 'Joint 2')
     figure
-    plot(timesteps,error(:,3),'r',timesteps,error(:,4))
+    plot(timesteps,error(:,3),'r',timesteps,error(:,4), 'b')
     title('Errors - dQ')
+    legend('Joint 1', 'Joint 2')
 end
 
 fprintf('To plot the Robot Motion press inv \n')
