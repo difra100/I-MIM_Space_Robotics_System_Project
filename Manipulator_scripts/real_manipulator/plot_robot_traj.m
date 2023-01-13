@@ -12,7 +12,7 @@ target_pos = target_pos;
 figure
 show(robot,q_d(1,:)');
 
-axis([-1,1,-1,1,-1,1]*30);
+axis([-1,1,-1,1,-1,1]*10);
 %view(2)
 %ax = gca;
 %ax.Projection = 'orthographic';
@@ -24,7 +24,7 @@ plot3(points(:,1),points(:,2),points(:,3),'k')
 %-------> SpaceCraft = CUBE
 hold on
 dir = -pi : pi/2 : pi;                       % Define Corners                                         
-side = 2;                   % Define Angular Orientation (‘pi/4ase’)
+side = 1;                   % Define Angular Orientation (1pi/4ase0)
 x_cube = [cos(dir+pi/4); cos(dir+pi/4)]/cos(pi/4)*side;
 y_cube = [sin(dir+pi/4); sin(dir+pi/4)]/sin(pi/4)*side;
 z_cube = [-ones(size(dir)); ones(size(dir))]*side;
@@ -39,7 +39,7 @@ scatter3(EE_pos(1),EE_pos(2),EE_pos(3),10,'r','filled');
 hold on
 
 tip_pos = subs(f_tip,q,q_d(1,:)');
-scatter3(tip_pos(1),tip_pos(2),tip_pos(3),10,'b','filled');
+scatter3(tip_pos(1),tip_pos(2),tip_pos(3),2,'b','filled');
 
 %------> Target (planet) = FULL SPHERE
 hold on

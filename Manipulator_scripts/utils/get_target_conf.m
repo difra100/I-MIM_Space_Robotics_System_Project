@@ -6,7 +6,7 @@ function q_f = get_target_conf(target,q_bounds, init_guess, l, L_s)
 % Imposing x,y,z = x_tip,y_tip,z_tip (belongs to the rect)
 % Looking for matricial form:
 
-disp('Finding the solution...')
+disp('Getting the solution to the problem of inverse kinematics:')
 
 %% Constrained Solution
 q_1 = optimvar('q_1',1,'LowerBound',q_bounds.low(1),'UpperBound',q_bounds.high(1)); % 3-by-3 variable
@@ -46,11 +46,11 @@ q0.q_2 = init_guess(2);
 
 
 if q_s.q_1 <= q_bounds.high(1) && q_s.q_2 <= q_bounds.high(2) && q_s.q_1>= q_bounds.low(1) && q_s.q_2 >= q_bounds.low(2)
-    disp('The solution is feasible..........')
-    q_f = [q_s.q_1; q_s.q_2]
-    fval = fval
+    q_f = [q_s.q_1; q_s.q_2];
+    fprintf('\nOne feasible solution has been found: [%f, %f]\n',q_f')
+    fprintf('with a confidence of: +/- %f\n',fval)
 else 
-    disp('No good solution')
+    disp('No feasible solution has been found!')
     q_f = init_guess;
 
 

@@ -4,13 +4,13 @@ clear all
 %% INSTANTIATIONS
 init;
 
-verbosity = 2;
+verbosity = 3;
 %Verbosity gives what is printed/shown:
 % - 0: Nothing 
 % - 1: kinematic/dynamics components (only)
 % - 2: plots (only)
 % - 3: (1) and (2)
-fprintf('Verbosity level: %i\n\n',verbosity);
+fprintf('\nVerbosity level: %i\n',verbosity);
 
 %% CREATING THE ROBOT
 
@@ -34,13 +34,15 @@ J_g = [J_L;J_A] ;
 
 
 if (verbosity == 1 || verbosity == 3)
-    fprintf('\n\n---------------------- Kinematics ---------------------')
+    fprintf('\n\n---------------------- Kinematics ---------------------\n')
     fprintf('\n - Forward kinematics:\n')
     fprintf('   %s\n',vpa(p_EE,2))
     fprintf('\n - Analitic Jacobian:\n')
     fprintf('   %s %s \n',vpa(J_a,2))
     fprintf('\n - Geometric Jacobian:\n')
     fprintf('   %s %s\n',vpa(J_g,2))
+    fprintf('\n--------------------------------------------------------\n')
+
 end
 
 
@@ -53,7 +55,7 @@ end
 % dx=2;
 % T_lvlh_b= DHMatrix([-pi/2,dx,dx,0]); % Inertia frame -> base frame
 
-fprintf('To get to the Dynamic components press inv \n')
+fprintf('\n----> To get to the Dynamic components press inv \n')
 pause()
 %% DYNAMIC COMPONENTS
 
@@ -61,7 +63,7 @@ pause()
 [M_true, V_true, B_true, C_true] = dynamic_model(q, dq, ddq, m_true, l_true, d_true, I1_true,I2_true);
 
 if (verbosity == 1 || verbosity == 3)
-    fprintf('\n\n------------------------ Dynamic componets ------------------------')
+    fprintf('\n\n------------------------ Dynamic componets ------------------------\n')
     fprintf('\n - Inertia matrix:\n')
     fprintf('   %s %s \n',vpa(M,3))
     fprintf('\n - Coreolis and Centrifugal term:\n')
@@ -70,6 +72,7 @@ if (verbosity == 1 || verbosity == 3)
     fprintf('   %s\n',vpa(B,3))
     fprintf('\n - Centrifugal term:\n')
     fprintf('   %s %s \n',vpa(C,3))
+    fprintf('\n--------------------------------------------------------\n')
 end
 
 tau_c= [(1 + sign(dq(1)))/2 *tauC_plus + (1 - sign(dq(1)))/2 *tauC_minus;
@@ -86,11 +89,11 @@ tau_c= [(1 + sign(dq(1)))/2 *tauC_plus + (1 - sign(dq(1)))/2 *tauC_minus;
 % conservative_comp =  M*ddq + V;
 % non_conservative_comp = tau_c + J_L'*atm_drag;
 % 
-% disp('------------------------ Final dynamic model -------------------')
+% disp('------------------------ Final dynamic model -------------------\n')
 % tau = conservative_comp - non_conservative_comp;
 % disp('tau:')
 % disp(vpa(tau,2))
-fprintf('To get to the Trajectories press inv \n')
+fprintf('\n----> To get to the Trajectories press inv \n')
 pause()
 % TRAJECTORIES
 orbit_ts = minutes*6; % Each timestep has 10 seconds of distance.
@@ -105,7 +108,7 @@ mars_target = [];
 earth_target = [];
 
 R_of_nadir = rotm2tform(elem_rot_mat('y',deg2rad(15)));
-for i=1:3
+for i=1:orbit_ts
     mars_target_i = R_of_nadir*[cell2mat(mars_target_cell(i));1];
     mars_target(:,end+1) = mars_target_i(1:3);
     earth_target_i = [cell2mat(earth_target_cell(i));1];
@@ -120,24 +123,19 @@ ddq_ss = [0;0]';
 pointss = [];
 tot_time = 0;
 
-if (verbosity == 1 || verbosity == 3)
-    fprintf('\n\n ------------------------ Trajectories ---------------------------')
-end
+
 
 % Get full trajectory
-
-
 % input : q_i q_ss, dq_ss, ddq_ss, tot_time, target_poss
 % output : q_f q_ss, dq_ss, ddq_ss, tot_time
 
 
-disp(' Mars pointing trajectory ')
+fprintf('\n********** Mars pointing trajectory *************\n')
 [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit(q,dq, t, ...
     q_i, q_ss, dq_ss, ddq_ss, pointss, tot_time, mars_target, M, p_EE, L_s, ...
     ni, I_m, B_m, tau_max,tau_c, theta_bounds, l, sampling_rate);
 
-
-disp(' Earth pointing trajectory ')
+fprintf('\n********* Earth pointing trajectory *************\n')
 [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit(q,dq, t, ...
     q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time, earth_target, M, p_EE, L_s, ...
     ni, I_m, B_m, tau_max,tau_c, theta_bounds, l, sampling_rate);
@@ -146,7 +144,7 @@ if (verbosity == 2 || verbosity == 3)
     plot_robot_traj(robot, q_ss, pointss, earth_target(:,end),q,p_EE,p_tip);
 end
 
-fprintf('To get to the Control part press inv \n')
+fprintf('\n----> To get to the Control part press inv \n')
 pause()
 discr_interval = 1/sampling_rate;
 timesteps = (0:discr_interval:tot_time)';
@@ -205,9 +203,9 @@ trajectory = pointss;
 
 
 options = odeset('RelTol', 1.0E-4, 'AbsTol', 1.0E-4);
-
+dips('Integration steps:')
 for i = 1:count_steps-1
-    fprintf('Step %i \n',i)
+    fprintf(' - Step %i \n',i)
     %Build the controller part in ored to compute the effective acc command...
     
     % Get the value of the errors from integration (as done in IDA_control):
@@ -271,7 +269,7 @@ end
 fprintf('To plot the Robot Motion press inv \n')
 pause()
 if (verbosity == 2 || verbosity == 3)
-    plot_robot_traj(robot, q_0, trajectory, cell2mat(earth_target(size(earth_target,2))),q,p_EE,p_tip)
+    plot_robot_traj(robot, q_0, trajectory, earth_target(:,end),q,p_EE,p_tip)
 end
 
 

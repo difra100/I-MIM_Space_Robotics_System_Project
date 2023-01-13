@@ -4,7 +4,7 @@ function robot = create_robot(l,q_i, L_s)
 robot = rigidBodyTree('DataFormat','col'); %The 'base' is actually the inertia frame
 
 
-[DHparam,T_o_b] = DH_generator(l,q_i, L_s);
+[DHparam,T_lvlh_b] = DH_generator(l,q_i, L_s);
 col1 = DHparam(:,1);
 col2 = DHparam(:,2);
 col3 = DHparam(:,3);
@@ -16,7 +16,7 @@ DHparam = [col2 col1 col3 col4];
 
 body0 = rigidBody('base_fixed');
 transf = rigidBodyJoint('transf', 'fixed');
-setFixedTransform(transf, T_o_b);
+setFixedTransform(transf, T_lvlh_b);
 body0.Joint = transf;
 addBody(robot, body0, 'base');
 
