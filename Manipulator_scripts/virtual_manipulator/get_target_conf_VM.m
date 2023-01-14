@@ -6,9 +6,9 @@ function q_f = get_target_conf_VM(target, q_bounds, init_guess, l_0,l)
 disp('Finding the solution...')
 
 %% Constrained Solution
-theta1 = optimvar('theta1', 1);
-theta2 = optimvar('theta2', 1);
-theta3 = optimvar('theta3', 1);
+theta1 = optimvar('theta1', 1, 'LowerBound',-2*pi, 'UpperBound',2*pi);
+theta2 = optimvar('theta2', 1, 'LowerBound',-2*pi, 'UpperBound',2*pi);
+theta3 = optimvar('theta3', 1, 'LowerBound',-2*pi, 'UpperBound',2*pi);
 q_1 = optimvar('q_1',1,'LowerBound',q_bounds.low(1),'UpperBound',q_bounds.high(1)); % 3-by-3 variable
 q_2 = optimvar('q_2',1,'LowerBound',q_bounds.low(2),'UpperBound',q_bounds.high(2));
 
