@@ -1,0 +1,54 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{bm}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{derivative}
+\usepackage{color}
+\usepackage{optidef}
+\usepackage{tensor}
+\usepackage{multirow}
+\begin{document}
+
+\section{Manipulator model}\\
+\subsection{Manipulator's DH Table}
+The manipulator is defined via the Denavit-Hartenberg classical convention; the \ref{table:DH} summarizes its characteristics. The Figure XXX schematically shows the manipulator in a generic pose with its links and rotary joints. The squared plane represents the spacecraft’s face whose normal is aligned with the orbit’s angular momentum vector.\\
+
+\begin{tabular}{ |p{2.5cm} p{2.5cm} p{2.5cm}  p{2.5cm} p{2.5cm}|}
+ \hline
+ \multicolumn{5}{|c|}{DH Table} \\
+ \hline
+  & $\alpha [deg]$ & a [m] & d [m] & $\Theta$ \\
+ \hline
+ Joint 1 & $\tfrac{\pi}{2}$ & 0 & $L_1$ & $q_1$\\
+ Joint 2 & 0 & $L_2$ & 0 & $q_2$\\
+ \hline
+\end{tabular}
+\caption{Manipulator DH table.}
+\label{table:DH}\\[1\baselineskip]
+
+\textcolor{red}{Inserire immagine "Manipualtor_ritagliata" che ho messo nella cartella "Overleaf_txt"}\\[1\baselineskip]
+
+\textcolor{black}{Considering the spacecraft’s central body like a cube of side length L = 1 m, the Transformation matrix from the LVLH to the base frame can be defined as shown in eq. XXX. The LVLH frame (Local Vertical Local Horizontal) is located at the cube’s center with the z-axis pointing towards the planet, the y axis parallel to the spacecraft velocity and the x-axis to get a right-handed triad. The base frame is located at the center of the spacecraft face where the manipulator is mounted with the x and y axis lying on it while the z axis is parallel and agree(?) to the first joint rotation axis. The figure XXX shows the s/c with the LVLH and Base frames attached on it.} 
+
+\begin{equation}
+  ^{B}_{LVLH}T = R_{y}\left(\dfrac{\pi}{2}\right) R_{z}\left(\dfrac{\pi}{4}\right) D_{z}\left(\dfrac{L}{2}\right)  
+\end{equation}
+
+\textcolor{black}{The rotation of 45 deg around the z axis is to adjust and orient the manipulator's workspace in order to permit a better pointing of Mars and Earth both and contemporary to guarantee that the joint angles do not get too close to the limits of the workspace avoiding singularities.}\\[1\baselineskip]
+
+\textcolor{red}{Inserire immagine che mostra come sono orientati LVLH, e base frame e le rotazioni intermedie}\\[1\baselineskip]
+
+
+
+
+
+
+
+\end{document}
