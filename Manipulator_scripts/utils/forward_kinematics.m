@@ -1,7 +1,8 @@
 function [T_0N, R_0N, p] = forward_kinematics(DHTABLE,T_i_b)
 % INPUTS:
 % - DH table = [alpha_i a_i d_i theta_i]           
-
+% - T_i_b is an homogeneous transformation that enables the possibility to
+% express the base frame points in to a generic frame 'i'
          
 %% Build the general Denavit-Hartenberg trasformation matrix
 syms alpha_i a_i d_i theta_i real
@@ -30,7 +31,6 @@ end
 T = eye(4); 
 for i=1:N
     T = T*A{i};
-%     T = simplify(T)
 end
 
 T_0N = T_i_b*T;    % final Transformation matrix (roto-translation)

@@ -2,7 +2,7 @@
 clear all
 
 %% INSTANTIATIONS
-init;
+init; % init script contains all the instances.
 
 verbosity = 3;
 %Verbosity gives what is printed/shown:
@@ -52,9 +52,6 @@ end
 % T_EE:  BASE frame -> EE frame
 % T_lvlh_b : LVLH frame -> BASE frame
 
-% dx=2;
-% T_lvlh_b= DHMatrix([-pi/2,dx,dx,0]); % Inertia frame -> base frame
-
 fprintf('\n----> To get to the Dynamic components press inv \n')
 pause()
 %% DYNAMIC COMPONENTS
@@ -96,18 +93,22 @@ tau_c= [(1 + sign(dq(1)))/2 *tauC_plus + (1 - sign(dq(1)))/2 *tauC_minus;
 fprintf('\n----> To get to the Trajectories press inv \n')
 pause()
 % TRAJECTORIES
+
+% orbit_ts corrensponds with the number of rows to consider from the planet
+% positions dataset.
+
 orbit_ts = minutes*6; % Each timestep has 10 seconds of distance.
 
 
-
-
-
 mars_target_cell = get_targets(0, orbit_ts, 1);% Extracting the first #orbit_ts points of mars position  (ts: time samples)
+% Earth positions are considered after a time delay equals to orbit_ts + 1.
 earth_target_cell = get_targets(orbit_ts+1, orbit_ts, 0);% Extracting the first #orbit_ts points of earth position (ts: time samples)
 mars_target = [];
 earth_target = [];
 
 R_of_nadir = rotm2tform(elem_rot_mat('y',deg2rad(15)));
+
+% Off-Nadir transformation
 for i=1:orbit_ts
     mars_target_i = R_of_nadir*[cell2mat(mars_target_cell(i));1];
     mars_target(:,end+1) = mars_target_i(1:3);
@@ -149,21 +150,6 @@ pause()
 discr_interval = 1/sampling_rate;
 timesteps = (0:discr_interval:tot_time)';
 
-% if (verbosity == 2 || verbosity == 3)
-%         figure
-%         plot(timesteps,q_ss(:,1),'r',timesteps,q_ss(:,2),'b')
-%         title('Configurations of trajectory',i)
-%         
-%         figure
-%         plot(timesteps,dqss(:,1),'r',timesteps,dq_ss(:,2),'b')
-%         title('Velocities of trajectory',i)
-%         
-%         figure
-%         plot(timesteps,ddqss(:,1),'r',timesteps,dd_qss(:,2),'b')
-%         title('Accelerations of trajectory',i)
-% end
-
-
 
 
 %% CONTROLLER
@@ -177,12 +163,9 @@ timesteps = (0:discr_interval:tot_time)';
 
 space_craft_velocity_base = T_lvlh_b*[spacecraft_velocity;1];  % Spacecraft velocity expressed in the base frame 
 
-atm_drag_fixed = (1/2) * drag_coeff * mars_density * Area_Antenna;        % without velocity = 1/2 * C_p * density * A
+atm_drag_fixed = (1/2) * drag_coeff * mars_density * Area_Antenna;        % without velocity F/V^2 = 1/2 * C_p * density * A
 
 
-
-
-timesteps = (0:discr_interval:tot_time)'; 
 count_steps = length(timesteps);
 
 commads = zeros(count_steps,2);
@@ -231,7 +214,7 @@ for i = 1:count_steps-1
     atm_drag_true = atm_drag + [0;randn(1)*10^-2;0];
 
     [t_int,error_int] = ode113(@(time,error)controller(time, error, q_d, dq_d, ddq_d, ...
-                            q,dq, timesteps, k_p, k_d, ...
+                            q,dq, k_p, k_d, ...
                             M, V,tau_c,J_L,atm_drag, ...
                             M_true,V_true,atm_drag_true, i), ...
                             tspan, error(i,:)', options);
@@ -269,9 +252,9 @@ end
 
 fprintf('To plot the Robot Motion press inv \n')
 pause()
-% if (verbosity == 2 || verbosity == 3)
-%     plot_robot_traj(robot, q_0, trajectory, earth_target(:,end),q,p_EE,p_tip)
-% end
+if (verbosity == 2 || verbosity == 3)
+    plot_robot_traj(robot, q_0, trajectory, earth_target(:,end),q,p_EE,p_tip)
+end
 
 
 

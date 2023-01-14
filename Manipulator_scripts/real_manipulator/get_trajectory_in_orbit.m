@@ -57,6 +57,7 @@ function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit
                                                       t, timesteps, q, position_EE);
         
         % Plots
+
 %         remaining_time = 10 - T;
 %         
 %         sampling_time = 1/sampling_rate;
@@ -68,6 +69,7 @@ function [q_f, q_ss, dq_ss, ddq_ss, pointss, tot_time] = get_trajectory_in_orbit
 %         qs = [qs;remaining_qs];
 %         dqs = [dqs; remaining_dqs];
 %         ddqs = [ddqs; remaining_ddqs];
+
         % Concatenation
         q_i = q_f;
         q_ss = [q_ss;qs(2:end, :)];
