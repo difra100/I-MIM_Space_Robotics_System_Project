@@ -14,81 +14,105 @@
 \usepackage{optidef}
 \usepackage{tensor}
 \begin{document}
-\section{Jacobian computation}\\
+\section{Jacobian computation}
 Forward kinematics allows to know the \textit{end-effector} (EE) position $p_{EE}(q)$ as a function of the joint variables. In addition to it, is possible to express the linear and angular components of the end effector's velocity by means of the geometric Jacobian \cite{robotics_reference}. \\In the 2-Link manipulator case, the Jacobian is a $6\times{2}$ matrix, composed by the linear and angular Jacobian, $J_L$ and $J_A$ respectively, such that 
 $J = \begin{bmatrix}
 J_L\\
 J_A\\
 \end{bmatrix}$, and:
 
-$$ \left \{
-\begin{array}{lr}
-  \dot{p}_E = J_L(q)\,\dot{q}  \\
-  \omega_E = J_A(q)\,\dot{q}
-\end{array}
-$$
-\\
+\begin{equation}
+    \centering
+    \left\{\begin{split} 
+      \dot{p}_E &= J_L(q)\,\dot{q}  \\
+      \omega_E &= J_A(q)\,\dot{q}
+      \end{split}\right.
+\end{equation}
+\break
 By doing so, it is possible to express a direct relation between the joint and EE velocities based only on geometric quantities. \\Dealing with two rotative joints, each of them is expressed by the following Jacobian:
-$$ \left \{
-\begin{array}{lr}
-     %J_L(q) =  z_{i-1}\times{p_{i-1,E}} = \pdv{p_{0,E}(q)}{q_i} \\
-     J_{L_i}(q) =  z_{i-1}\times{p_{i-1,E}} = \dfrac{\partial{p_{0,E}(q)}}{\partial{q_i}} \\
-     J_{A_i}(q) = z_{i-1}
-      
-\end{array}
-$$
+\begin{equation}
+    \centering
+    \left\{\begin{split} 
+    %J_L(q) =  z_{i-1}\times{p_{i-1,E}} = \pdv{p_{0,E}(q)}{q_i} \\
+     J_{L_i}(q) &=  z_{i-1}\times{p_{i-1,E}} = \dfrac{\partial{p_{0,E}(q)}}{\partial{q_i}} \\
+     J_{A_i}(q) &= z_{i-1}
+     \end{split}\right.
+\end{equation}
 where $z_{i-1}$ and $p_{i-1,E}$ are both referred to the base frame of the manipulator, $i \in \{1,2\}$.\\
 
 \textcolor{red}{Informazioni prese da dispense Adriano e libro "}
 
 \textcolor{blue}{$J*atm_drag$ serve slide 28 jacobian: per realazionare con joint space}
 
-\section{Robot configuration}\\
+\section{Robot configuration}
 After having obtained the orbits' configuration from the first task, we know the positions of Mars and Earth in a certain time window, and expressed in the LVLH frame. Then, as regards the mars target, we point at the off-nadir angle of the planet, rather than the nadir angle itself. Thus we have shifted the target by rotating the LVLH frame of 15 degrees, along an arbitrary axis. In our case, this last was the y-axis.\\
 Now, it's possible to generate the robot trajectory that points at the targets correctly, by satisfying any of the constraints imposed by the task guidelines.\\
 Carrying out the inverse kinematics of our space manipulator involved the following steps.\\
 \begin{enumerate}
-    \item Given any initial configuration $q_i \in \mathbb{R}^2$, it's computed the configuration $q_f \in \mathbb{R}^2$, according to the solution of an optimization problem,
+    \item Given any initial configuration $q_i \in \mathbb{R}^2$, it's computed the configuration $q_f \in \mathbb{R}^2$, according to the solution of the inverse kinematics problem.
     \item The path $q(s)$ between $q(s_i) = q_i$ and $q(s_f) = q_f$ is determined through quintic polynomials for the joint configurations, velocities and accelerations.
     \item The trajectory, which is provided with the use of a timing law, is computed by taking into account the additional constraints on the motor torques, if violated the time to execute the trajectory will be incremented.
     
 \end{enumerate}
 
 \subsection{Inverse Kinematics}
-The inverse kinematics is obtained as the solution of a constrained non-linear optimization problem, which aims to find a joint configuration $q^*$ such that the EE, the tip of the antenna and the considered planet are aligned.\\
+The inverse kinematics problem has been presented as a rather difficult task to resolve, due to the fact that our manipulator has 2 degrees of freedom, while the orientation of the end effector (EE) is SO(3), thus requires 3 degrees of freedom, making both classic analytic and numerical methods not effective.\\
+Consequently, we had to develop a rather unconventional method to solve the inverse kinematic problem. Specifically, for each pointing direction the corresponding joint configuration is obtained as the solution of a constrained non-linear optimization problem, which aims to find the joint angles $q^*$ such that the EE, the tip of the antenna and the considered planet are all lying on the same line.\\
 Before formulating the problem, it is necessary to define some notations.\\
 Let $^Fp_{EE}(q)$ be the EE position, expressed by the joint angles, in a generic reference frame $F$, and $^Fp_{tip}(q)$ the antenna position evaluated in the same manner. Then let us consider the target $^Ft$, as the planet's position for which we are interested in for the pointing, and $Q_{max}, Q_{min}$ as the joint bounds that must be satisfied in the solution. ($Q_{max}, Q_{min} \in \mathbb{R}^2$).\\ Finally we refer to $V_{EE}(q) = ^Ft - ^Fp_{EE}(q)$, and $V_{tip}(q) =  ^Ft - ^Fp_{tip}(q) $ as the distance between the EE and the target, and the antenna with the target respectively.\\
 The optimization task can be formulated as follows.\\
-\begin{eqnarray} \min_q & ||V_{EE}(q) \times V_{tip}(q)||_2^2\label{objective} 
-\end{eqnarray}
-\begin{eqnarray} \textrm{s.t.} & -V_{tip}(q)\cdot V_{EE}(q)} \leq 0 \label{scalar}&
-\end{eqnarray}
-\begin{eqnarray} &q_i \leq Q_{i,max} \quad i = 1, 2
-\end{eqnarray}
-\begin{eqnarray}  &-q_i \leq Q_{i,min} \quad i = 1, 2
-\end{eqnarray}
+
+\begin{subequations}
+\label{eq:optim}
+\begin{align}
+    \underset{X}{\text{minimize}}
+        & \quad ||V_{EE}(q) \times V_{tip}(q)||_2^2 \label{objective}\\
+    \text{subject to} 
+        & \quad -V_{tip}(q)\cdot V_{EE}(q) \leq 0 \label{scalar}\\
+        & \quad \quad q_i \leq Q_{i,max} \quad i = 1, 2 \nonumber\\
+        & \quad -q_i \leq Q_{i,min} \quad i = 1, 2 \nonumber
+\end{align}
+\end{subequations}
+
 In Equation \ref{objective}, the global solution of the problem would involve that the two lines are parallel, and it is only possible by zeroing the cross product. Additionally we do not want to have the EE as the middle point between the target and the antenna position, such scenario can be avoided by imposing the constraint in Equation \ref{scalar}.
 In our experiments, the reference frame $F$ chosen was LVLH.\\
 The solution is obtained through \textit{fmincon}{} solutor from the \textit{Matlab Optimization Toolbox} \cite{Optimization_Toolbox}.
-\subsection{Path planning}
-For each configuration determined at the previous step, a fifth order polynomial is used to allow the definition of position, velocity and acceleration at the starting and ending path segments:
-$$\theta(t)=a_0\,+a_1\,t+a_2\,t^2+a_3\,t^3+a_4\,t^4+a_5\,t^5$$
-and deriving with respect to t $\dot{\theta}$ and $\ddot{\theta}$ are obtained. Then, to determine the coefficients the following boundary conditions are imposed:
-$$\dot{\theta}_i(t_0)=\dot{\theta}_i(t_f)=0 \;\;\;\;\;\; ; \;\;\;\;\;\; \ddot{\theta}_i(t_0)=\ddot{\theta}_i(t_f)=0
-$$
-$$\theta_i(t_0)=\theta_{i,0} \;\;\;\;\;\; ; \;\;\;\;\;\ \theta_i(t_f)=\theta_{i,f}$$
-By computing the Jacobian a linear system is obtained, so the desired evolution in time of the joint angles, velocity and accelerations is easily computed.\\
 
-\subsubsection{Torque control}\\
-To verify that the torque required at each step doens't exceed the boundaries imposed by the motors, a parametric control is introduced. Given $s=\dfrac{t}{T}$, with $s\in{[0,1]}$ and $T=1$ at the initial step, the previous polynomial is implemented in the code with this substitution.\\
-Then, the torque at the motor side is computed as follows:
+
+
+\subsection{Path planning}
+All sequential configurations determined as solution to the inverse kinematic problem have been interpolated through a chain of fifth order polynomials, in order to be able to compute a continuous path up to the second order derivative (acceleration). The degree of the polynomial is essential, due to the fact that the manipulator is controlled in torque, therefore the commands for each time-step should be deployed in acceleration in order to be used by the controller. \\
+
+Regarding the formulation, the quintic polynomial and its derivatives are used to define each path segment in position, velocity and acceleration as follow:
+\begin{align*}
+\theta(s)&=a_0\,+a_1\,s+a_2\,s^2+a_3\,s^3+a_4\,s^4+a_5\,s^5\\
+\dot\theta(s)&=a_1\,+2\,a_2\,s+3\,a_3\,s^2+4\,a_4\,s^3+5\,a_5\,s^4\\
+\ddot\theta(s)&=2\,a_2+6\,a_3\,s+12\,a_4\,s^2+20\,a_5\,s^3
+\end{align*}
+where $s=s(t)=\dfrac{t}{T}\in{[0,1]}$ is the timing law associated to the path segment (this allows to compute T in a second movement, in order to be able to elongate the the time, in order to decrease the acceleration, in case 
+ during path the boundaries on the torqure are violated). \\
+Then, in order to determine the coefficients the following boundary conditions on position velocity and acceleration are imposed:
+\begin{align*}
+\theta_i(t_0)&=\theta_{i,0} \;\;\;\;\;\; ; \;\;\;\;\;\ \dot{\theta}_i(t_0)=\dot{\theta}_i(t_f)=0 \\
+\theta_i(t_f)&=\theta_{i,f}  \;\;\;\;\;\; ; \;\;\;\;\;\; \ddot{\theta}_i(t_0)=\ddot{\theta}_i(t_f)=0 
+\end{align*}
+
+where $\theta_{i,0}$ and $\theta_{i,f}$ are respectively the initial and final configuration of the segments, while $t_0$ and $t_f$ are the initial final time steps.
+Finally, by computing the Jacobian a linear system is obtained, so the desired evolution in time of the joint angles, velocity and accelerations is easily computed.\\
+
+\subsubsection{Torque control}
+Once the path has been computed, a timing law has to be formulated in order to guarantee that the torque required at each step does not exceed the boundaries imposed by the motors. The first attempt is done imposing $T=1\; s$ in the path from the previous step and compute the torque reogated by the motor ("\textit{motor side}") as follows:
 $$\tau_m=\left (I_m+\dfrac{I}{\eta^2}\right)\ddot{\theta}_m + \left(b_m+\dfrac{b}{\eta}^2\right)\,\dot{\theta}_m + \dfrac{\tau_c}{\eta}$$
-where: $\eta$ is the gear ratio, $b_m$ is the viscous friction coefficient, $\tau_c$ the static friction and $I$ and $I_m$ the inertia of the motor and the joints respectively. When the torque exceed the boundaries a scale factor for $T$ is computed, and by using the same discretization for $t$ a longer time for the joint to reach its position is allowed.
+where: $\eta$ is the gear ratio, $b_m$ is the viscous friction coefficient, $\tau_c$ the static friction and $I$ and $I_m$ the inertia of the motor and the joints respectively. \\
+Then, if the torque exceed the boundaries, a time scaling factor is computed as:
+$$\lambda = \sqrt{max_i\bigg\{\frac{\hat{\tau}_{i,max}}{\tau_{i,max}}\bigg\}}$$
+where $\hat{\tau}_{i,max}$ id the highest value of the torque erogated by the i-th joint motor, while $\tau_{i,max}$ is the corresponding boundary. The idea is simply to compute $\lambda < 0$ depending on the "most violated" constraint and then scale time as: $T'=\lambda\;T$
 
 \bibliographystyle{abbrv}
 \bibliography{robotics}
 
 
+    
 
 
 \end{document}
