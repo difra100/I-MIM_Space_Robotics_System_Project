@@ -3,9 +3,9 @@ clear all
 clc
 
 %% INSTANTIATIONS
-init;
+init; % Where all the instantiation are made.
 
-verbosity = 2;
+verbosity = 3;
 %Verbosity gives what is printed/shown:
 % - 0: Nothing 
 % - 1: kinematic/dynamics components (only)
@@ -18,8 +18,8 @@ fprintf('Verbosity level: %i\n\n',verbosity);
 % Get the original DHtable and modifying the mapping from LVLH to the base 
 % frame in order to include the new Dofs from the spaceCraft
 
-orbit_ts = minutes*6;
-DHtable = DH_generator_VM(L_s/2,l, Q_augm);
+orbit_ts = minutes*6; % Conversion factor to get the number of rows (10 secs for each) from the planet positions dataset.
+DHtable = DH_generator_VM(L_s/2,l, Q_augm); % Q_augm contains also the satellite's attitude angles. Note that they do not represent the satellite's attitude w.r.t. J2000 (LVLH ---> J2000), but it is the attitude w.r.t. LVLH. The assumption is that the robot change its orientation w.r.t. LVLH.
 
 time_instant = 1; % First instant to compute the virtual ground position 
 T_lvlh_j2000 = get_attitude(time_instant); % Get Satellite's attitude, (from LVLH to j2000) 
@@ -29,7 +29,7 @@ T_lvlh_j2000 = get_attitude(time_instant); % Get Satellite's attitude, (from LVL
 %% KINEMATICS
 DHtable_0 = subs(DHtable,theta_v,[0,0,0]');
 [T_EE_lvlh, ~, p_EE_lvlh,T_lvlh_b,T_j1_lvlh] = forward_kinematics_VM(DHtable_0);
-% T_j1_lvlh = T_lvlh_b*DHtransf(DHtable(1,:));
+
 T_tip_lvlh = T_EE_lvlh*trvec2tform([1,0,0]);
 p_j0_lvlh = T_lvlh_b(1:3,4);
 p_j1_lvlh = T_j1_lvlh(1:3,4);
@@ -42,6 +42,8 @@ vg = virtual_ground(c_2_j2000, R_, L_, m, m_s);
 
 [~,r_,l_] = virtual_manipulator(vg, R_, L_, m, m_s); 
 
+% Re-define the Link length of the robot, in the virtaul manipulator case
+% these are defined by the r, and l vectors.
 L0 = norm(r_(1));
 L1 = norm(r_(2)+l_(2));
 L2 = norm(r_(3)+l_(3));
@@ -57,20 +59,10 @@ p_tip = T_tip(1:3,4);
 
 %% IMPORTANT TRANSFORMATIONS
 
-% q_i = [0,0,0,pi/4,pi/3]';
-q_i = [0,0,0,0,0]';
+q_i = [0,0,0,0,0]'; % Spherical joint (0,0,0) means that is the same of LVLH orientation.
+
 robot = create_robot_VM(L0,[L1,L2],q_i);
-% 
-% [T_EE_real,~,~,~,~] = forward_kinematics(DHtable,T_lvlh_b);
-% 
-% T_EE_real = T_lvlh_j2000*T_EE_real;
-% p_EE_j2000 = T_EE_real(1:3,4);
-% T_tip_real = T_lvlh_j2000*T_EE_real*trvec2tform([1,0,0]);
-% p_tip_j2000 = T_tip_real(1:3,4);
-% 
-% fprintf(' Virtual E-E position: %f \n ',vpa(norm(subs(p_VM, Q_augm, q_i)), 6))
-% 
-% fprintf(' Real E-E position: %f \n',vpa(norm(subs(p_EE_j2000, Q_augm, q_i)), 6))
+
 vg_0 = double(subs(vg,Q_augm,q_i));
 
 
@@ -79,9 +71,9 @@ earth_target_cell = get_targets(orbit_ts+1, orbit_ts, 0);
 mars_target = [];
 earth_target = [];
 
-
+R_of_nadir = rotm2tform(elem_rot_mat('y',deg2rad(15)));
 for i=1:orbit_ts
-    mars_target_i = T_lvlh_j2000*trvec2tform(vg_0')*[cell2mat(mars_target_cell(i));1];
+    mars_target_i = R_of_nadir*T_lvlh_j2000*trvec2tform(vg_0')*[cell2mat(mars_target_cell(i));1];
     mars_target(:,end+1) = mars_target_i(1:3);
     earth_target_i = T_lvlh_j2000*trvec2tform(vg_0')*[cell2mat(earth_target_cell(i));1];
     earth_target(:,end+1) = earth_target_i(1:3);
@@ -113,9 +105,9 @@ disp(' Earth pointing trajectory ')
     earth_target, p_EE, ...
     theta_bounds, L0,[L1,L2], sampling_rate);
 
-% if (verbosity == 2 || verbosity == 3)
-%     plot_robot_traj_VM(robot, q_ss, pointss, mars_target(:,end),Q_augm,p_EE,p_tip);
-% end
+if (verbosity == 2 || verbosity == 3)
+    plot_robot_traj_VM(robot, q_ss, pointss, mars_target(:,end),Q_augm,p_EE,p_tip);
+end
 
 timesteps = (1:size(q_ss));
 

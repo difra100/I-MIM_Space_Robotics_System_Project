@@ -6,6 +6,10 @@ function q_f = get_target_conf_VM(target, q_bounds, init_guess, l_0,l)
 disp('Finding the solution...')
 
 %% Constrained Solution
+
+% To avoid getting any divergency in the solution, it has been introduced some
+% artificial boundaries to the fictitious satellite's attitude's angles
+% theta1, theta2 and theta3.
 theta1 = optimvar('theta1', 1, 'LowerBound',-2*pi, 'UpperBound',2*pi);
 theta2 = optimvar('theta2', 1, 'LowerBound',-2*pi, 'UpperBound',2*pi);
 theta3 = optimvar('theta3', 1, 'LowerBound',-2*pi, 'UpperBound',2*pi);
@@ -25,7 +29,9 @@ f = p_EE;
 v_1 = target - f;       % direction from EE to target
 v_2 = target - f_tip;         % direction of the antenna
 
-obj = norm(cross(v_1,v_2))^2; %+ 10*(norm(v_2)/0.001*norm(v_1));
+obj = norm(cross(v_1,v_2))^2;
+
+% The objective formulation is better explained in the report
 
 prob = optimproblem("Objective", obj, 'ObjectiveSense', 'min');
 prob.Constraints.c1 = -v_2'*v_1 <= 0; 
@@ -37,17 +43,6 @@ q0.theta3 = init_guess(3);
 q0.q_1 = init_guess(4);
 q0.q_2 = init_guess(5);
 [q_s,fval] = solve(prob,q0);
-
-
-%% UNCONSTRAINED SOLUTION
-
-% options = optimoptions('fminunc','Display','final','Algorithm','quasi-newton');
-% q_f = init_guess;
-% in = init_guess;
-% 
-% fh2 = matlabFunction(obj,'vars',{q}); 
-% % fh2 = objective with no gradient or Hessian
-% [q_f,fval,exitflag,output2] = fminunc(fh2,init_guess,options);
 
 
 if q_s.q_1 <= q_bounds.high(1) && q_s.q_2 <= q_bounds.high(2) && q_s.q_1>= q_bounds.low(1) && q_s.q_2 >= q_bounds.low(2)

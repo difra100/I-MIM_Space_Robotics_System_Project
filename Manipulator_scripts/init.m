@@ -118,7 +118,7 @@ tauC_minus= -7.09e-4;
 % c_f = 3;     %Coulomb
 
 %% PLOT PARAMETERS
-minutes = 30;
+minutes = 1/6;  % 30 (minutes) for the experiments described in the report.
 
 %% CONTROL/TRAJECTORY PARAMETERS
 sampling_rate = 20;     % This would determine the discrettization step

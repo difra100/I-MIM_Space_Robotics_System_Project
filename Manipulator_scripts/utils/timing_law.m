@@ -1,9 +1,9 @@
 function time_scaling = timing_law(q,s,path,tau_m,tau_max)
 
 % Timing law computation
-% The idea is that you get the function in time of the torque erogated by
-% the motors (as a time series), get the max value, get the violation (in
-% respect to the baundaries), compute the necessary time scaling and finally 
+% The idea is that you get the torque erogated by
+% the motors (as a time series), get the max value, and consequently the violation (with
+% respect to the boundaries), compute the necessary time scaling and finally 
 % get the timing law by tuning the total time of motion (T).
 
 time_steps = (0:0.02:1)'; % Time
