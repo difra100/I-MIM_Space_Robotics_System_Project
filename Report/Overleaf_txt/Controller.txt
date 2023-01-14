@@ -1,0 +1,71 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{bm}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{derivative}
+\usepackage{color}
+\usepackage{optidef}
+\usepackage{tensor}
+\usepackage{multirow}
+\begin{document}
+
+\section{Robot Control}\\
+\subsection{External disturbance}
+At this point the trajectory is available in discrete time, for each time step we can retrieve the configuration through the dynamic model. Now, it is possible to take in account the atmospheric drag, $a_D$, modelled as follows:
+$$a_D=\frac{1}{2}\,c_D\,\rho\,S_A\,v_{SC}^2$$
+where:
+\begin{itemize}
+    \item $c_D = 0.3$, is the drag coefficient;
+    \item $\rho = 10^{-14}\; [kg/m^3]$, is the atmospheric density of Mars atmosphere considered constant;
+    \item $S_A = 28.27\; [m^2]$, is the surface of the antenna, supposed to be always fully exposed;
+    \item $v_{SC}$, is the spacecraft velocity.
+\end{itemize}\\
+To relate this external disturbance to the joint space is sufficient to multiply by the transposed of the Jacobian. Under the hypotesis that the drag effects are only dependent on the position of the EE, it is possible to write:
+$$\tau_a=J_L^T\,a_D$$
+
+\subsection{Mismodelling}
+With the aim of dealing with a closer to reality model, a mismodeling is introduced. So, the "true" variables are created by the sum of the nominal value and the term given by the multiplication of an arbitrary tolerance and the AWGN. For a general variable X we have:
+$$X_{true} = X_{nom} + AWGN*X_{toll} $$
+The table \textcolor{red}{Inserire rif incrociato alla tabella qui sotto} show the tolerances adopted for each given nominal variable; which will be three order smaller than the nominal value \\
+
+\begin{tabular}{ |p{3cm}||p{3cm}||p{3cm}|  }
+ \hline
+ \multicolumn{3}{|c|}{Tolerances List} \\
+ \hline
+ Variables Name& Tolerance &Measurement unit\\
+ \hline
+ Link Length & $10^{-3}$ & m\\
+ Link Radius & $10^{-4}$ & m\\
+ Link Thickness & $10^{-6}$ & m\\
+ \hline
+\end{tabular}\\
+\\
+The result is that all the computed variables which uses these three will be affected by mismodelling, this is the case of the matrices M, V, B and C; which mismodeled version will be called "true" in the code and denoted with an hat in this paper.
+
+\subsection{Control scheme}
+The controller is modelled as a feedforward nonlinear control with external perturbations.\\
+
+\includegraphics[width=\textwidth]{control_scheme.jpeg}
+\caption{Fig.\textcolor{red}{mettere numero giusto}: Control scheme used for the robot model.}\\[8pt]
+The configurations given in input is "disturbed" by artificially adding an AWGN, so to have the error, $e$, computed as the desired configuration minus the actual one:
+$$e=\theta_d-\theta$$
+$$\dot{e}=\dot{\theta_d}-\dot{\theta}$$
+The commanded acceleration, $\tau'$ can be computed as:
+$$\tau'=\ddot{\theta}_d+k_v\,\dot{e}+k_p\,e$$
+with $k_v=400$ and $k_d=2\,\sqrt{k_v}$ being the control gains. Then, the effective required torque is easily obtained:
+$$\tau=M\,\tau_d+V-\tau_c-\tau_a$$
+To evaluate the differential error to be integrated it is also computed:
+$$\ddot{e}=\ddot{\theta}_d-M_{true}\left(-V+\tau_c+\tau_a+\tau\right)^{-1}$$
+After the integration the integral error is retrieved and the effective trajectory can be evalueted.\\
+
+
+
+
+\end{document}

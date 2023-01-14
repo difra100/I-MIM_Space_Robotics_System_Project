@@ -68,7 +68,8 @@ The optimization task can be formulated as follows.\\
 \begin{eqnarray}  &-q_i \leq Q_{i,min} \quad i = 1, 2
 \end{eqnarray}
 In Equation \ref{objective}, the global solution of the problem would involve that the two lines are parallel, and it is only possible by zeroing the cross product. Additionally we do not want to have the EE as the middle point between the target and the antenna position, such scenario can be avoided by imposing the constraint in Equation \ref{scalar}.
-In our experiments, the reference frame $F$ chosen was LVLH.
+In our experiments, the reference frame $F$ chosen was LVLH.\\
+The solution is obtained through \textit{fmincon}{} solutor from the \textit{Matlab Optimization Toolbox} \cite{Optimization_Toolbox}.
 \subsection{Path planning}
 For each configuration determined at the previous step, a fifth order polynomial is used to allow the definition of position, velocity and acceleration at the starting and ending path segments:
 $$\theta(t)=a_0\,+a_1\,t+a_2\,t^2+a_3\,t^3+a_4\,t^4+a_5\,t^5$$
@@ -84,11 +85,11 @@ Then, the torque at the motor side is computed as follows:
 $$\tau_m=\left (I_m+\dfrac{I}{\eta^2}\right)\ddot{\theta}_m + \left(b_m+\dfrac{b}{\eta}^2\right)\,\dot{\theta}_m + \dfrac{\tau_c}{\eta}$$
 where: $\eta$ is the gear ratio, $b_m$ is the viscous friction coefficient, $\tau_c$ the static friction and $I$ and $I_m$ the inertia of the motor and the joints respectively. When the torque exceed the boundaries a scale factor for $T$ is computed, and by using the same discretization for $t$ a longer time for the joint to reach its position is allowed.
 
-
 \bibliographystyle{abbrv}
 \bibliography{robotics}
 
 
+
+
 \end{document}
 Footer
-
