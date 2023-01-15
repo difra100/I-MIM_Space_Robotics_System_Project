@@ -1,0 +1,40 @@
+\documentclass[main.tex]{subfiles}
+
+\begin{document}
+\section{Part 3: Virtual manipulator}\label{sec:development}
+\subsection{Virtual manipulator model}
+
+\subsubsection{Introduction}
+
+
+The method, originally proposed by \textit{Vafa} and \textit{Dubowsky} \cite{virtual_manipulator}, introduces the concept of a \textit{Virtual Manipulator}" for the modelling of manipulators working in space (Fig. \ref{fig:V_M}). 
+
+\begin{wrapfigure}{r}{0.4\textwidth}
+ \centering
+\includegraphics[width=0.4\textwidth]{figures/images_for_manipulator/virtual_manipulator.png} 
+\caption{Virual manipulator}
+\label{fig:V_M}
+\end{wrapfigure}
+
+It is shown that the implementation of a virtual manipulator and a virtual ground can facilitate the planning and control of the actual manipulator mounted on the spacecraft while simultaneously minimizing the degrading consequences of manipulator/vehicle dynamic interactions.
+The virtual ground is an imaginary point, fixed in inertial space, defined as the center of mass of the whole system. If the spacecraft is unaffected by external forces (such as reaction wheels or ACS jets) the position of the virtual ground will remain unchanged in inertial space. Analogously, internal forces given by joint torques or forces will also not move the position of the VG. As such the virtual manipulator is shown \cite{virtual_manipulator} to have exploitable properties which enables us to model the kinematic and dynamic motion of the free-floating manipulator system by utilizing the simpler virtual manipulator which has a fixed base in inertial space.
+
+\subsubsection{Theoretical implementation}
+In the virtual space, the manipulator gains degrees of freedom related to the position and attitude of the spacecraft. Our system will therefore have 6 + 2 DOF. \\
+
+The location of the virtual ground is found given the initial configuration of the manipulator system. The position of the center of mass of each link $C_i (t)$ is defined with respect to an inertial reference frame, which in our case is MJ2000 as extracted from the General Mission Analysis Tool (GMAT). Given our 2 link spatial manipulator the total number of links in the VM will therefore be comprised of a spherical joint associated with the spacecraft degrees of freedom and he previously defined 1-DOF links. The VG will be obtained through the formula \ref{eq:v_G}.
+
+\begin{equation}
+    V_g = \sum^2_{i=0}\left[c_N(0)-\sum_{q=1}^2(R_q(0)+L_{q+1}(0))\right]\frac{M_i}{M_{tot}}
+    \label{eq:v_G}
+\end{equation}
+with $i$=link number.\\
+
+Having computed the position of the virtual ground we introduce the vectors $V_i$ which will define the position of the $i^th$ link of the VM, as in the formulas \
+\begin{align*}
+      V_0&=r_0
+    V_i&=
+\end{align*}
+
+
+\end{document}

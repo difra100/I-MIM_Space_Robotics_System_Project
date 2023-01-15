@@ -1,4 +1,4 @@
-%\documentclass[main.tex]{subfiles}
+\documentclass[main.tex]{subfiles}
 
 \begin{document}
 \section{Part 2: Manipulator Design}\label{sec:development}
@@ -6,14 +6,11 @@
 
 \subsection{Manipulator model}
 
-\begin{wraptable}{r}{5.5 cm}
+\begin{wraptable}{r}{5.0cm}
 \scalebox{0.8}{
 \begin{tabular}[b]{ |c c c c c|}      \hline
-
      \multicolumn{5}{|c|}{DH Table} \\   \hline
-   
       & $\alpha [rad]$ & a [m] & d [m] & $\Theta$ \\  \hline
-     
      Joint 1 & $\tfrac{\pi}{2}$ & 0 & $L_1$ & $q_1$\\
      Joint 2 & 0 & $L_2$ & 0 & $q_2$\\
      \hline
@@ -27,7 +24,7 @@ The manipulator is defined via the Denavit-Hartenberg classical convention, whos
 
 \begin{figure}[!ht]
     \centering
-        \includegraphics[width=0.6\textwidth]{figures/Manipulator_ritagliata.jpg}
+        \includegraphics[width=0.6\textwidth]{figures/images_for_manipulator/Manipulator_ritagliata.jpg}
         \caption{Manipulator design.}
         \label{fig:manipulator}
 \end{figure}
@@ -47,9 +44,14 @@ The rotation of 45 deg around the z axis is to adjust and orient the manipulator
   \label{eq: T_lvlh_b}
 \end{equation}
 
-The figure XXX shows the s/c with the LVLH and Base frames attached on it.
+The figure \ref{fig:space_manipulator} shows the s/c with the LVLH and Base frames attached on it.
 
-
+\begin{figure}[!ht]
+    \centering
+        \includegraphics[width=0.8\textwidth]{figures/images_for_manipulator/Space_manipulator_and_frame_ritagliata.jpg}
+        \caption{Manipulator position on the spacecraft.}
+        \label{fig:space_manipulator}
+\end{figure}
 
 \subsection{Jacobian matrix}
 Forward kinematics allows to know the \textit{end-effector} (EE) position $p_{EE}(q)$ as a function of the joint variables. In addition to it, is possible to express the linear and angular components of the end effector's velocity by means of the geometric Jacobian ~\protect{\cite{robotics_reference}}. \\In the 2-Link manipulator case, the Jacobian is a $6\times{2}$ matrix, composed by the linear and angular Jacobian, $J_L$ and $J_A$ respectively, such that 
@@ -66,7 +68,7 @@ J_A\\
       \end{split}\right.
 \end{equation}
 \break
-By doing so, it is possible to express a direct relation between the joint and EE velocities based only on geometric quantities. \\Dealing with two revolut joints, each of them is expressed by the following Jacobian:
+By doing so, it is possible to express a direct relation between the joint and Cartesian velocities based only on geometric quantities (the same for the  relation between torques and forces through the transpose). \\Dealing with two revolut joints, each of them is expressed by the following Jacobian:
 \begin{equation}
     \centering
     \left\{\begin{split} 
@@ -76,6 +78,7 @@ By doing so, it is possible to express a direct relation between the joint and E
      \end{split}\right.
 \end{equation}
 where $z_{i-1}$ and $p_{i-1,E}$ are both referred to the base frame of the manipulator, $i \in \{1,2\}$.\\
+
 
 %\textcolor{red}{Informazioni prese da dispense Adriano e libro di sicialiano, oriolo etc..."}
 
@@ -91,7 +94,7 @@ $$\dfrac{d}{dt}\dfrac{\partial{T(\Theta,\dot{\Theta})}}{\partial{\dot{\Theta}}}-
 being: 
 $\Theta = \begin{bmatrix} \theta_1;\theta_2\end{bmatrix}^{T}$.\\
 
-To retrieve the Mass matrix, $M$, it is possible to extract the individual terms by deriving the total kinematic energy two times with respect to $\dot{\Theta}$, remembering that these are the coefficients multiplying the velocities of the joints.\\
+To retrieve the Mass matrix ($M$), it is possible to extract the individual terms by deriving the total kinematic energy two times with respect to $\dot{\Theta}$, remembering that these are the coefficients multiplying the velocities of the joints.\\
 
 The Velocity matrix, $V$, is retrieved through the use of the Christoffel Matrices, $C_i$. Thus, being $m_{i,j}$ the Mass matrix' coefficients and $c_{ij}$ the Christoffel symbols referred to the $k$ joint, with:
 $$c_{ji}^k=c_{ij}^k=\frac{1}{2}\,\left(\dfrac{\partial{m_{kj}}}{\partial{q_i}}+\dfrac{\partial{m_{ki}}}{\partial{q_j}}-\dfrac{\partial{m_{ij}}}{\partial{q_k}}\right)$$
@@ -100,8 +103,18 @@ $$V_k = \dot{\Theta}^{T}\,C_k\,\dot{\Theta}$$
 
 From this formulation it is also possible to split the Velocity matrix to take in account the Coriolis and centrifugal coefficients with the $B(\Theta)$ and $C(\Theta)$ matrices respectively; in this way the Configuration-Space equation cam be written as:
 $$M(\Theta)\,\ddot{\Theta}+B(\Theta)\,[\dot{\Theta}\dot{\Theta}]+C(\Theta)\,[\dot{\Theta}]^2=\tau$$
-\\
-\textcolor{red}{CAPIRE MEGLIO COME INSERIRE I TERMINI DI FRIZIONE}
+
+In addition, friction has been taken into account too as the as Coulomb friction, computed as constant value which depends on the direction of the angular velocity for each of the joints:
+\begin{equation}
+    \centering
+    \tau_c = 
+    \left\{\begin{split} 
+     &\tau_c^+  \;\;\; &&\omega>0  \\
+     &0 \;\;\;  &&\omega=0   \\
+     &\tau_c^- \;\;\; &&\omega<0 
+      \end{split}\right.
+\end{equation}
+
 
 \subsection{Trajectory planning}
 
@@ -119,8 +132,7 @@ The inverse kinematics problem has been presented as a rather difficult task to 
 Consequently, we had to develop a rather unconventional method to solve the inverse kinematic problem. Specifically, for each pointing direction the corresponding joint configuration is obtained as the solution of a constrained non-linear optimization problem, which aims to find the joint angles $q^*$ such that the EE, the tip of the antenna and the considered planet are all lying on the same line.\\
 Before formulating the problem, it is necessary to define some notations.\\
 Let $^Fp_{EE}(q)$ be the EE position, expressed by the joint angles, in a generic reference frame $F$, and $^Fp_{tip}(q)$ the antenna position evaluated in the same manner. Then let us consider the target $^Ft$, as the planet's position for which we are interested in for the pointing, and $Q_{max}, Q_{min}$ as the joint bounds that must be satisfied in the solution. ($Q_{max}, Q_{min} \in \mathbb{R}^2$).\\ Finally we refer to $V_{EE}(q) = ^Ft - ^Fp_{EE}(q)$, and $V_{tip}(q) =  ^Ft - ^Fp_{tip}(q) $ as the distance between the EE and the target, and the antenna with the target respectively.\\
-The optimization task can be formulated as follows.\\
-
+The optimization task can be formulated as follows:
 \begin{subequations}
 \label{eq:optim}
 \begin{align}
@@ -226,10 +238,11 @@ where:
 \end{itemize}
 
 \begin{figure}[htp]
-    \includegraphics[width=\textwidth]{figures/control_scheme.jpeg}
+    \includegraphics[width=\textwidth]{figures/images_for_manipulator/control_scheme.jpeg}
     \caption{Control scheme used for the robot model.}
 \label{fig:ConSch}
 \end{figure}
+\textcolor{red}{TOCCA RIFARE IL GRAFICO DEL CONTROLLORE...}
 
 Proceeding with the code implementation, the controller receives in input the desired trajectory and the previous errors ($e,\dot e$) and then follows the next steps:\\
 \begin{enumerate}
@@ -245,8 +258,19 @@ Finally, after the integration the integral error is retrieved and the effective
 
 
 \subsection{Experiment setup and results}
-%description of the setup of the orbits data and stuff
-%plots of the trajectory execution 
+
+\subsubsection{Set-up}
+
+
+% description of the setup of the orbits data and stuff
+% plots of the trajectory execution 
+
+\subsubsection{Results}
+
+
+
+
+
 
 \bibliographystyle{abbrv}
 \bibliography{ref}
