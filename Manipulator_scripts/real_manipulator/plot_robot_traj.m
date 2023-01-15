@@ -13,6 +13,9 @@ figure
 show(robot,q_d(1,:)');
 
 axis([-1,1,-1,1,-1,1]*10);
+
+xlabel('Y')
+ylabel('X')
 %view(2)
 %ax = gca;
 %ax.Projection = 'orthographic';
@@ -34,7 +37,7 @@ patch(x_cube', y_cube', z_cube', 'w');
 %------> Antenna
 hold on
 EE_pos = subs(f,q,q_d(1,:)');
-scatter3(EE_pos(1),EE_pos(2),EE_pos(3),10,'r','filled');
+scatter3(EE_pos(1),EE_pos(2),EE_pos(3),5,'r','filled');
 
 hold on
 
