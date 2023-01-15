@@ -1,0 +1,9 @@
+@ARTICLE{Control algorithms for space manipulator,
+  author={Papadopoulos, E. and Dubowsky, S.},
+  journal={IEEE Transactions on Robotics and Automation}, 
+  title={On the nature of control algorithms for free-floating space manipulators}, 
+  year={1991},
+  volume={7},
+  number={6},
+  pages={750-758},
+  doi={10.1109/70.105384}}
